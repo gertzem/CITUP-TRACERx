@@ -1,0 +1,21 @@
+citup2:
+  conipher:
+    citup_py: "../CITUP/citup_recomb_w_mike_mig10.py"
+    num_solutions: 1
+    dag_solutions: 1
+    args: | 
+      --min-mutations-per-cluster 0 \
+      --fixClusterMapping \
+      --objective cluster \
+      --clusterWeight equal \
+      --clip-observed-at 1.0 \
+      --co-presence-reward 0 \
+      --mike-presence-threshold 0.025 \
+      --presence-threshold 0.025 \
+      --enum-fit-abs 0.005 \
+      --enum-max-trees 1 \
+      --enum-time-limit 3600 \
+      --mike-gamma 0.01 \
+      --mike-node-trigger-mode proxy_all_obs \
+      --duo-present-reward 0.0051  \
+      --mike-admissibility-mode recursive \
