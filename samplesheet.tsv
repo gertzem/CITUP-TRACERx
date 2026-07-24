@@ -1,126 +1,126 @@
-person
-CRUK0003
-CRUK0004
-CRUK0009
-CRUK0010
-CRUK0013
-CRUK0022
-CRUK0027
-CRUK0029
-CRUK0035
-CRUK0036
-CRUK0041
-CRUK0044
-CRUK0048
-CRUK0052
-CRUK0063
-CRUK0074
-CRUK0083
-CRUK0084_Tumour2
-CRUK0087
-CRUK0090
-CRUK0092
-CRUK0097
-CRUK0099
-CRUK0100
-CRUK0178
-CRUK0183
-CRUK0206
-CRUK0227
-CRUK0236
-CRUK0242
-CRUK0245
-CRUK0250
-CRUK0256
-CRUK0284
-CRUK0286
-CRUK0290
-CRUK0296
-CRUK0299
-CRUK0301_Tumour1
-CRUK0311
-CRUK0325
-CRUK0337
-CRUK0343
-CRUK0344
-CRUK0352
-CRUK0361
-CRUK0368
-CRUK0369
-CRUK0372_Tumour1
-CRUK0388
-CRUK0407
-CRUK0410
-CRUK0412
-CRUK0415
-CRUK0418
-CRUK0422
-CRUK0444
-CRUK0451
-CRUK0452
-CRUK0453
-CRUK0465
-CRUK0467
-CRUK0468
-CRUK0472
-CRUK0476
-CRUK0478
-CRUK0484
-CRUK0485
-CRUK0487
-CRUK0495
-CRUK0496
-CRUK0497
-CRUK0510
-CRUK0514
-CRUK0516
-CRUK0519
-CRUK0524
-CRUK0528
-CRUK0530
-CRUK0537
-CRUK0543
-CRUK0552
-CRUK0557
-CRUK0559
-CRUK0567
-CRUK0572
-CRUK0584
-CRUK0587
-CRUK0589
-CRUK0590
-CRUK0596
-CRUK0598
-CRUK0609
-CRUK0617
-CRUK0620_Tumour1
-CRUK0625
-CRUK0636
-CRUK0640
-CRUK0666
-CRUK0667
-CRUK0691
-CRUK0693
-CRUK0698
-CRUK0702
-CRUK0707
-CRUK0714
-CRUK0718
-CRUK0719
-CRUK0721_Tumour1
-CRUK0722
-CRUK0730
-CRUK0733
-CRUK0736
-CRUK0737
-CRUK0742
-CRUK0745
-CRUK0748
-CRUK0762
-CRUK0766
-CRUK0769
-CRUK0794
-CRUK0799
-CRUK0810
-CRUK0817
-CRUK0872
+person	metastases
+CRUK0003	p.lymphnode1
+CRUK0004	progression1
+CRUK0009	p.lymphnode1
+CRUK0010	p.lymphnode1,relapse1,relapse2,relapse3
+CRUK0013	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4
+CRUK0022	p.lymphnode1
+CRUK0027	p.lymphnode1
+CRUK0029	p.lymphnode5,p.lymphnode7,p.lymphnode8,relapse1
+CRUK0035	p.lymphnode1,p.lymphnode4,p.lymphnode3,progression1,relapse1
+CRUK0036	relapse1
+CRUK0041	relapse1
+CRUK0044	relapse1
+CRUK0048	relapse1,relapse1
+CRUK0052	p.lymphnode1
+CRUK0063	p.lymphnode1,relapse1
+CRUK0074	relapse1
+CRUK0083	p.lymphnode1
+CRUK0084_Tumour2	relapse10
+CRUK0087	p.lymphnode1,p.lymphnode2
+CRUK0090	progression1,relapse1,progression2
+CRUK0092	p.lymphnode1
+CRUK0097	relapse1
+CRUK0099	p.lymphnode2
+CRUK0100	p.lymphnode1
+CRUK0178	p.lymphnode1
+CRUK0183	p.lymphnode1
+CRUK0206	p.lymphnode1,relapse1,relapse1,relapse1,relapse1,relapse1
+CRUK0227	p.lymphnode1
+CRUK0236	p.lymphnode1
+CRUK0242	p.lymphnode1,relapse1
+CRUK0245	p.lymphnode1,p.lymphnode3,p.lymphnode4
+CRUK0250	relapse1
+CRUK0256	p.lymphnode1,p.lymphnode2
+CRUK0284	progression1,relapse1
+CRUK0286	relapse1
+CRUK0290	p.lymphnode1,p.lymphnode2
+CRUK0296	relapse1
+CRUK0299	relapse1,relapse2
+CRUK0301_Tumour1	p.lymphnode1
+CRUK0311	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4
+CRUK0325	relapse1,p.lymphnode1
+CRUK0337	p.lymphnode1
+CRUK0343	p.lymphnode1,p.lymphnode2
+CRUK0344	relapse1
+CRUK0352	p.lymphnode1
+CRUK0361	relapse1
+CRUK0368	p.lymphnode3,relapse1
+CRUK0369	p.lymphnode3
+CRUK0372_Tumour1	p.lymphnode2
+CRUK0388	p.lymphnode1,p.lymphnode2
+CRUK0407	p.lymphnode1
+CRUK0410	relapse1
+CRUK0412	p.lymphnode4
+CRUK0415	p.lymphnode2,p.lymphnode4
+CRUK0418	p.lymphnode1
+CRUK0422	p.lymphnode1
+CRUK0444	p.lymphnode1
+CRUK0451	p.lymphnode1
+CRUK0452	p.lymphnode2,p.lymphnode1
+CRUK0453	relapse1
+CRUK0465	p.lymphnode1,p.lymphnode2
+CRUK0467	p.lymphnode1,progression1,relapse1
+CRUK0468	p.lymphnode1,p.lymphnode2
+CRUK0472	p.lymphnode1,relapse1
+CRUK0476	p.lymphnode1
+CRUK0478	relapse1
+CRUK0484	p.lymphnode1,progression1,p.lymphnode2,progression2,progression2,relapse1
+CRUK0485	p.lymphnode1
+CRUK0487	p.lymphnode1,p.lymphnode6,p.lymphnode5,p.lymphnode4
+CRUK0495	synchronous
+CRUK0496	p.lymphnode1
+CRUK0497	relapse1
+CRUK0510	p.lymphnode1
+CRUK0514	relapse1
+CRUK0516	relapse1
+CRUK0519	synchronous,synchronous,p.lymphnode1
+CRUK0524	p.lymphnode1
+CRUK0528	p.lymphnode1
+CRUK0530	p.lymphnode1,p.lymphnode2,relapse1
+CRUK0537	relapse1
+CRUK0543	p.lymphnode1,p.lymphnode3,p.lymphnode5
+CRUK0552	relapse1
+CRUK0557	p.lymphnode1,relapse1
+CRUK0559	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1
+CRUK0567	p.lymphnode1
+CRUK0572	p.lymphnode1,p.lymphnode2
+CRUK0584	p.lymphnode1,relapse1
+CRUK0587	relapse1,p.lymphnode1
+CRUK0589	p.lymphnode1
+CRUK0590	relapse1,relapse1,relapse3,p.lymphnode1
+CRUK0596	p.lymphnode2
+CRUK0598	p.lymphnode2
+CRUK0609	p.lymphnode1
+CRUK0617	p.lymphnode1
+CRUK0620_Tumour1	p.lymphnode1,p.lymphnode6,p.lymphnode5
+CRUK0625	p.lymphnode1
+CRUK0636	relapse1
+CRUK0640	p.lymphnode2
+CRUK0666	p.lymphnode1
+CRUK0667	p.lymphnode1
+CRUK0691	p.lymphnode1
+CRUK0693	p.lymphnode1
+CRUK0698	p.lymphnode1,p.lymphnode2
+CRUK0702	p.lymphnode1,p.lymphnode4
+CRUK0707	p.lymphnode1
+CRUK0714	p.lymphnode1,relapse1
+CRUK0718	p.lymphnode1
+CRUK0719	relapse1,relapse1
+CRUK0721_Tumour1	p.lymphnode1
+CRUK0722	p.lymphnode1,p.lymphnode4,p.lymphnode3
+CRUK0730	relapse1
+CRUK0733	p.lymphnode1
+CRUK0736	p.lymphnode1,p.lymphnode2
+CRUK0737	p.lymphnode1
+CRUK0742	p.lymphnode1
+CRUK0745	p.lymphnode1,p.lymphnode2,p.lymphnode5,p.lymphnode8
+CRUK0748	p.lymphnode2,p.lymphnode8,p.lymphnode6
+CRUK0762	p.lymphnode1,p.lymphnode2,p.lymphnode6,p.lymphnode4,p.lymphnode5
+CRUK0766	p.lymphnode1
+CRUK0769	relapse1
+CRUK0794	p.lymphnode1
+CRUK0799	p.lymphnode1,p.lymphnode2
+CRUK0810	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1
+CRUK0817	relapse1
+CRUK0872	p.lymphnode1
