@@ -2,7 +2,9 @@ import pandas as pd
 import sys
 from pathlib import Path
 
-for file in sys.argv[1:]:
+results = []
+samples = pd.read_csv(sys.argv[1], sep="\t")
+for file in sys.argv[2:]:
     basedir = Path(file)
     base = basedir.name
 
