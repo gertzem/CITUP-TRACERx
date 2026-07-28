@@ -4,7 +4,7 @@ import pandas as pd
 configfile: "config.yaml"
 
 
-SAMPLESHEET = pd.read_csv("samplesheet.tsv", sep="\t")
+SAMPLESHEET = pd.read_csv("samplesheet.tsv", sep="\t", comment="#")
 
 
 rule citup2:

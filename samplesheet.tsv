@@ -43,7 +43,7 @@ CRUK0325	relapse1,p.lymphnode1	3	2,3,4,5,6
 CRUK0337	p.lymphnode1	1	1,2,3,4
 CRUK0343	p.lymphnode1,p.lymphnode2	3	2,3,4,5,6
 CRUK0344	relapse1	1	1,2,3,4
-CRUK0352	p.lymphnode1	5	5,6,7
+#CRUK0352	p.lymphnode1	5	5,6,7
 CRUK0361	relapse1	3	2,3,4,5,6
 CRUK0368	p.lymphnode3,relapse1	4	2,3,4,5,6,7
 CRUK0369	p.lymphnode3	2	1,2,3,4
@@ -121,6 +121,6 @@ CRUK0766	p.lymphnode1	2	1,2,3,4,5
 CRUK0769	relapse1	3	1,2,3,4
 CRUK0794	p.lymphnode1	1	1,2,3,4
 CRUK0799	p.lymphnode1,p.lymphnode2	4	3,4,5,6,7
-CRUK0810	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1	10	10,11,12
+#CRUK0810	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1	10	10,11,12
 CRUK0817	relapse1	1	1,2,3
 CRUK0872	p.lymphnode1	1	1,2,3,4
