@@ -183,6 +183,51 @@ rule citup_migration:
             {params.args} --gurobi-threads {threads}
         """
 
+rule citup_pareto_mets:
+    output:
+        "results/citup_scan_mets/{method}/pareto/{person}/pareto.txt",
+    input:
+        lambda w: expand(
+            "results/citup_scan_mets/{{method}}/mig_{migrations:03d}/{{person}}/{{person}}.mig_{migrations:03d}.treeScores.tsv",
+            migrations=[int(m) for m in SAMPLESHEET.query("person==@w.person").tests.iloc[0].split(",")],
+        ),
+    localrule: True
+    shell:
+        """
+        python scripts/pareto_front.py {input} > {output}
+        """
+
+rule citup_migration_mets:
+    output:
+        "results/citup_scan_mets/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
+    input:
+        "data/tracerx/{person}/mutations.tsv",
+        "data/tracerx/{person}/sites.tsv",
+    params:
+        args=lambda w: config["citup_scan"][w.model]["args"],
+        citup_py=lambda w: config["citup_scan"][w.model]["citup_py"],
+        numSolutions=lambda w: config["citup_scan"][w.model]["num_solutions"],
+        metastatic_sites=lambda w: SAMPLESHEET.query(
+            "person == @w.person"
+        ).metastases.iloc[0],
+        max_migrations=lambda w: int(w.migrations),
+    resources:
+        runtime=960,
+        mem_mb=8 * 1024,
+    threads: 8
+    shell:
+        """
+        output={output}
+        prefix=${{output%.treeScores.tsv}}
+        python {params.citup_py} \\
+            -f {input[0]} \\
+            --sites-file {input[1]} \\
+            -o $prefix \\
+            --metastatic-sites {params.metastatic_sites} \\
+            --numSolutions {params.numSolutions} \\
+            --mike-max-migrations {params.max_migrations} \\
+            {params.args} --gurobi-threads {threads}
+        """
 
 rule citup_conipher_free:
     input:
@@ -213,5 +258,12 @@ rule citup_conipher_pareto:
     input:
         expand(
             "results/citup_scan/conipher/{person}/trees/pareto.txt",
+            person=SAMPLESHEET.person,
+        ),
+
+rule citup_conipher_pareto_mets:
+    input:
+        expand(
+            "results/citup_scan_mets/conipher/pareto/{person}/pareto.txt",
             person=SAMPLESHEET.person,
         ),
