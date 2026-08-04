@@ -107,6 +107,45 @@ rule citup2_mets:
         """
 
 
+rule citup2_optimal_mets:
+    output:
+        directory("results/citup_scan_mets/{model}/pareto/{person}/trees"),
+    input:
+        mutations="data/tracerx/{person}/mutations.tsv",
+        sites="data/tracerx/{person}/sites.tsv",
+    params:
+        args=lambda w: config["citup_optimal"][w.model]["args"],
+        citup_py=lambda w: config["citup_optimal"][w.model]["citup_py"],
+        numSolutions=lambda w: config["citup_optimal"][w.model]["num_solutions"],
+        dagSolutions=lambda w: config["citup_optimal"][w.model]["dag_solutions"],
+        metastatic_sites=lambda w: SAMPLESHEET.query(
+            "person == @w.person"
+        ).metastases.iloc[0],
+        argmin=lambda w: int(SAMPLESHEET.query(
+            "person == @w.person"
+        ).argmin.iloc[0]),
+    resources:
+        runtime=960,
+        mem_mb=8 * 1024,
+    threads: 8
+    shell:
+        """
+        outdir={output[0]}
+        mkdir -p $outdir
+        outprefix="$outdir/{wildcards.person}"
+        python {params.citup_py} \\
+            -f {input.mutations} \\
+            --sites-file {input.sites} \\
+            --metastatic-sites {params.metastatic_sites} \\
+            -o $outprefix \\
+            --enum-max-trees {params.dagSolutions} \\
+            --numSolutions {params.numSolutions} \\
+            --mike-max-migrations {params.argmin} \\
+            {params.args} --gurobi-threads {threads}
+        """
+
+
+
 rule citup2_free_mets:
     output:
         directory("results/citup2_free_mets/{model}/{person}/trees"),
@@ -168,7 +207,7 @@ rule citup_migration:
         numSolutions=lambda w: config["citup_scan"][w.model]["num_solutions"],
     resources:
         runtime=960,
-        mem_mb=8 * 1024,
+        mem_mb=16 * 1024,
     threads: 8
     shell:
         """
@@ -232,6 +271,12 @@ rule citup_migration_mets:
 rule citup_conipher_free:
     input:
         expand("results/citup2/conipher/{person}/trees", person=SAMPLESHEET.person),
+
+
+rule citup_mets_optimal:
+    input:
+        expand("results/citup_scan_mets/conipher/pareto/{person}/trees", 
+                person=SAMPLESHEET.query('~argmin.isna()').person),
 
 
 rule citup_conipher_fixed:
