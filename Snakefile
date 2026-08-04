@@ -261,6 +261,14 @@ rule citup_conipher_pareto:
             person=SAMPLESHEET.person,
         ),
 
+rule citup_mig8_pareto:
+    input:
+        expand(
+            "results/citup_scan/mig8/{person}/trees/pareto.txt",
+            person=SAMPLESHEET.person,
+        ),
+
+
 rule citup_conipher_pareto_mets:
     input:
         expand(
