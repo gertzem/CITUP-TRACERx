@@ -52,6 +52,22 @@ citup_scan:
       --mike-node-trigger-mode proxy_all_obs \
       --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
+  mig8a:
+    citup_py: "../CITUP/citup_recomb_w_mike_mig8.py"
+    num_solutions: 1
+    dag_solutions: 1
+    args: | 
+      --min-mutations-per-cluster 0 \
+      --fixClusterMapping \
+      --objective cluster \
+      --clusterWeight equal \
+      --clip-observed-at 1.0 \
+      --co-presence-reward 0 \
+      --mike-presence-threshold 0.025 \
+      --presence-threshold 0.025 \
+      --mike-node-trigger-mode proxy_all_obs \
+      --duo-present-reward 0.0051  \
+      --mike-admissibility-mode recursive \
 citup_optimal:
   conipher:
     citup_py: "../CITUP/citup_recomb_w_mike_mig10.py"

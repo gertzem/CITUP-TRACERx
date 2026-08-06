@@ -251,7 +251,7 @@ rule citup_migration_mets:
         ).metastases.iloc[0],
         max_migrations=lambda w: int(w.migrations),
     resources:
-        runtime=960,
+        runtime=24 * 60,
         mem_mb=8 * 1024,
     threads: 8
     shell:
@@ -305,6 +305,14 @@ rule citup_conipher_pareto:
             "results/citup_scan/conipher/{person}/trees/pareto.txt",
             person=SAMPLESHEET.person,
         ),
+
+rule citup_mig8a_pareto:
+    input:
+        expand(
+            "results/citup_scan/mig8a/{person}/trees/pareto.txt",
+            person=SAMPLESHEET.person,
+        ),
+
 
 rule citup_mig8_pareto:
     input:
