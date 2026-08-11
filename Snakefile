@@ -125,7 +125,7 @@ rule citup2_optimal_mets:
             "person == @w.person"
         ).argmin.iloc[0]),
     resources:
-        runtime=960,
+        runtime=48 * 60,
         mem_mb=8 * 1024,
     threads: 8
     shell:
@@ -373,3 +373,17 @@ rule citup_conipher_pareto_mets:
             "results/citup_scan_mets/conipher/pareto/{person}/pareto.txt",
             person=SAMPLESHEET.person,
         ),
+
+
+rule read_pareto_optimal:
+    output:
+        "results/citup_scan_mets/conipher/pareto/optima.tsv"
+    input: 
+        expand(
+            "results/citup_scan_mets/conipher/pareto/{person}/pareto.txt",
+            person=SAMPLESHEET.person,
+        ),
+    params:
+        samples=lambda w: SAMPLESHEET.to_json(orient="records"),
+    script:
+        "read_pareto_optimal.py"
