@@ -43,8 +43,8 @@ CRUK0325	relapse1,p.lymphnode1	3	2,3,4,5,6,7,8	2,3,4,5,6,7,8	3	1.0
 CRUK0337	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0343	p.lymphnode1,p.lymphnode2	3	2,3,4,5,6,7,8,9,10	2,3,4,5,6,7,8,9,10	3	1.0
 CRUK0344	relapse1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
-CRUK0352	p.lymphnode1	5	5,6,7	5,6,7	6	
-CRUK0361	relapse1	3	1,2,3,4,5,6,7	1,2,3,4,5,6,7	6	1.0
+CRUK0352	p.lymphnode1	5	5,6,7	5,6,7	5	
+CRUK0361	relapse1	3	1,2,3,4,5,6,7	1,2,3,4,5,6,7	3	1.0
 CRUK0368	p.lymphnode3,relapse1	4	2,3,4,5,6,7,8,9,10	2,3,4,5,6,7,8,9,10	4	1.0
 CRUK0369	p.lymphnode3	2	2,3,4	2,3,4	2	1.0
 CRUK0372_Tumour1	p.lymphnode2	3	2,3,4,5,6,7,8	2,3,4,5,6,7,8	3	1.0
