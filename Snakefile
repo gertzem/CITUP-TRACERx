@@ -309,7 +309,8 @@ rule citup_conipher_free_mets_optima:
     output: 
         "results/citup2_free_mets/conipher/optima.tsv",
     input:
-        expand("results/citup2_free_mets/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
+        expand("results/citup2_free_mets/conipher/{person}/trees/{person}.tree_0.txt", 
+                person=SAMPLESHEET.query('~free_mets_optima.isna()').person),
     shell:
         """
         python scripts/read_citup_obj.py {input} > {output}
