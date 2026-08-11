@@ -273,6 +273,49 @@ rule citup_conipher_free:
         expand("results/citup2/conipher/{person}/trees", person=SAMPLESHEET.person),
 
 
+rule citup_conipher_optima:
+    output: 
+        "results/citup2/conipher/optima.tsv",
+    input:
+        expand("results/citup2/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
+    shell:
+        """
+        python scripts/read_citup_obj.py {input} > {output}
+        """
+
+rule citup_conipher_fixed_optima:
+    output: 
+        "results/citup2_fixed/conipher/optima.tsv",
+    input:
+        expand("results/citup2/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
+    shell:
+        """
+        python scripts/read_citup_obj.py {input} > {output}
+        """
+
+
+rule citup_conipher_fixed_mets_optima:
+    output: 
+        "results/citup2_mets/conipher/optima.tsv",
+    input:
+        expand("results/citup2_mets/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
+    shell:
+        """
+        python scripts/read_citup_obj.py {input} > {output}
+        """
+
+
+rule citup_conipher_free_mets_optima:
+    output: 
+        "results/citup2_free_mets/conipher/optima.tsv",
+    input:
+        expand("results/citup2_free_mets/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
+    shell:
+        """
+        python scripts/read_citup_obj.py {input} > {output}
+        """
+
+
 rule citup_mets_optimal:
     input:
         expand("results/citup_scan_mets/conipher/pareto/{person}/trees", 
@@ -289,6 +332,7 @@ rule citup_conipher_fixed:
 rule citup_conipher_mets:
     input:
         expand("results/citup2_mets/conipher/{person}/trees", person=SAMPLESHEET.person),
+
 
 
 rule citup_conipher_free_mets:
