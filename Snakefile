@@ -125,7 +125,7 @@ rule citup2_optimal_mets:
             "person == @w.person"
         ).argmin.iloc[0]),
     resources:
-        runtime=48 * 60,
+        runtime=24 * 60,
         mem_mb=8 * 1024,
     threads: 8
     shell:
@@ -160,7 +160,7 @@ rule citup2_free_mets:
             "person == @w.person"
         ).metastases.iloc[0],
     resources:
-        runtime=960,
+        runtime=48 * 60,
         mem_mb=8 * 1024,
     threads: 8
     group:
