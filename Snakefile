@@ -268,6 +268,27 @@ rule citup_migration_mets:
             {params.args} --gurobi-threads {threads}
         """
 
+rule plot_one_mets_scan:
+    output:
+        directory("results/citup_scan_mets/{model}/mig_{migrations}/{person}/plots"),
+    input:
+        "results/citup_scan_mets/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
+        "data/tracerx/{person}/sites.tsv",
+    localrule: True
+    shell:
+        """
+        mkdir -p {output}
+        indir=$(dirname {input[0]})
+
+        python ../CITUP/plot_with_gene_names.py "$indir" \\
+            --output-dir {output} \\
+            --sample-sites {input[1]} \\
+            --with-site-transitions \\
+            --with_node_info \\
+            --all-mike-dag-colorings
+        """
+
+
 rule citup_conipher_free:
     input:
         expand("results/citup2/conipher/{person}/trees", person=SAMPLESHEET.person),
