@@ -38,7 +38,7 @@ CRUK0290	p.lymphnode1,p.lymphnode2	5	3,4,5,6,7,8,9,10,11,12	3,4,5,6,7,8,9,10,11,
 CRUK0296	relapse1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0299	relapse1,relapse2	6	5,6,7,8,9,10,11	5,6,7,8,9,10,11	6	1.0
 CRUK0301_Tumour1	p.lymphnode1	2	1,2,3,4	1,2,3,4	2	1.0
-CRUK0311	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4	9	8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23	9,10,11,12,14,15,16,17,19,20,21,22,23	9	1.0
+CRUK0311	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4	9	8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23	8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23	9	1.0
 CRUK0325	relapse1,p.lymphnode1	3	2,3,4,5,6,7,8	2,3,4,5,6,7,8	3	1.0
 CRUK0337	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0343	p.lymphnode1,p.lymphnode2	3	2,3,4,5,6,7,8,9,10	2,3,4,5,6,7,8,9,10	3	1.0
@@ -54,7 +54,7 @@ CRUK0410	relapse1	2	1,2,3,4,5,6,7	1,2,3,4,5,6,7	2	1.0
 CRUK0412	p.lymphnode4	1	1,2,3,4,5,6	1,2,3,4,5,6	1	1.0
 CRUK0415	p.lymphnode2,p.lymphnode4	10	7,8,9,10,11,12,13,14,15	7,8,9,10,11,12,13,14,15	10	1.0
 CRUK0418	p.lymphnode1	3	3,4,5,6	3,4,5,6	3	1.0
-CRUK0422	p.lymphnode1	1	1,2,3,4	1,2,3	1	1.0
+CRUK0422	p.lymphnode1	1	1,2,3,4	1,2,3,4	1	1.0
 CRUK0444	p.lymphnode1	3	1,2,3,4,5,6,7	1,2,3,4,5,6,7	3	1.0
 CRUK0451	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0452	p.lymphnode2,p.lymphnode1	4	3,4,5,6,7,8,9	3,4,5,6,7,8,9	4	1.0
@@ -65,7 +65,7 @@ CRUK0468	p.lymphnode1,p.lymphnode2	5	3,4,5,6,7,8	3,4,5,6,7,8	5	1.0
 CRUK0472	p.lymphnode1,relapse1	3	2,3,4,5,6,7,8,9	2,3,4,5,6,7,8,9	3	1.0
 CRUK0476	p.lymphnode1	3	1,2,3,4,5,6,7	1,2,3,4,5,6,7	3	1.0
 CRUK0478	relapse1	4	2,3,4,5,6,7,8,9,10,11	2,3,4,5,6,7,8,9,10,11	5	1.0
-CRUK0484	p.lymphnode1,progression1,p.lymphnode2,progression2,progression2,relapse1	13	12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31	12,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29,30	13	1.0
+CRUK0484	p.lymphnode1,progression1,p.lymphnode2,progression2,progression2,relapse1	13	12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31	12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31	13	1.0
 CRUK0485	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0487	p.lymphnode1,p.lymphnode6,p.lymphnode5,p.lymphnode4	12	10,11,12,13,14,15,16,17,18,19,20	10,11,12,13,14,15,16,17,18,19,20	12	1.0
 CRUK0495	synchronous	2	1,2,3,4,5	1,2,3,4,5	2	1.0
@@ -82,7 +82,7 @@ CRUK0537	relapse1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0543	p.lymphnode1,p.lymphnode3,p.lymphnode5	5	5,6,7,8,9,10,11,12,13,14,15	5,6,7,8,9,10,11,12,13,14,15	6	1.0
 CRUK0552	relapse1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0557	p.lymphnode1,relapse1	4	2,3,4,5,6,7,8,9,10	2,3,4,5,6,7,8,9,10	4	1.0
-CRUK0559	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1	11	7,8,9,10,11,12,13,14,15,16,17,18,19,20,21	8,9,10,11,12,13,14,15,16,17,18,19,20,21	11	1.0
+CRUK0559	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1	11	7,8,9,10,11,12,13,14,15,16,17,18,19,20,21	7,8,9,10,11,12,13,14,15,16,17,18,19,20,21	11	1.0
 CRUK0567	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0572	p.lymphnode1,p.lymphnode2	2	2,3,4,5,6,7,8	2,3,4,5,6,7,8	2	1.0
 CRUK0584	p.lymphnode1,relapse1	3	2,3,4,5,6,7,8,9	2,3,4,5,6,7,8,9	3	1.0
@@ -105,7 +105,7 @@ CRUK0698	p.lymphnode1,p.lymphnode2	4	3,4,5,6,7,8,9	3,4,5,6,7,8,9	4	1.0
 CRUK0702	p.lymphnode1,p.lymphnode4	3	2,3,4,5,6,7,8	2,3,4,5,6,7,8	3	1.0
 CRUK0707	p.lymphnode1	2	1,2,3,4,5,6	1,2,3,4,5,6	2	1.0
 CRUK0714	p.lymphnode1,relapse1	2	2,3,4,5,6,7	2,3,4,5,6,7	2	1.0
-CRUK0718	p.lymphnode1	1	1,2,3,4	1,2,3	1	1.0
+CRUK0718	p.lymphnode1	1	1,2,3,4	1,2,3,4	1	1.0
 CRUK0719	relapse1,relapse1	2	1,2,3,4,5	1,2,3,4,5	2	1.0
 CRUK0721_Tumour1	p.lymphnode1	1	1,2,3,4,5,6	1,2,3,4,5,6	1	1.0
 CRUK0722	p.lymphnode1,p.lymphnode4,p.lymphnode3	5	3,4,5,6,7,8,9,10,11	3,4,5,6,7,8,9,10,11	5	1.0
@@ -114,13 +114,13 @@ CRUK0733	p.lymphnode1	3	1,2,3,4,5,6,7	1,2,3,4,5,6,7	3	1.0
 CRUK0736	p.lymphnode1,p.lymphnode2	6	4,5,6,7,8,9,10,11,12,13	4,5,6,7,8,9,10,11,12,13	6	1.0
 CRUK0737	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0742	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
-CRUK0745	p.lymphnode1,p.lymphnode2,p.lymphnode5,p.lymphnode8	12	12,13,14,15,16,17,18,19,20,21,22	12,13,14,15,18,19,20,21,22	12	1.0
+CRUK0745	p.lymphnode1,p.lymphnode2,p.lymphnode5,p.lymphnode8	12	12,13,14,15,16,17,18,19,20,21,22	12,13,14,15,16,17,18,19,20,21,22	12	1.0
 CRUK0748	p.lymphnode2,p.lymphnode8,p.lymphnode6	12	10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25	10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25	12	1.0
 CRUK0762	p.lymphnode1,p.lymphnode2,p.lymphnode6,p.lymphnode4,p.lymphnode5	14	12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30	12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30	14	1.0
 CRUK0766	p.lymphnode1	2	1,2,3,4,5,6	1,2,3,4,5,6	2	1.0
 CRUK0769	relapse1	3	1,2,3,4	1,2,3,4	3	1.0
 CRUK0794	p.lymphnode1	1	1,2	1,2	1	1.0
 CRUK0799	p.lymphnode1,p.lymphnode2	4	4,5,6,7,8,9,10,11	4,5,6,7,8,9,10,11	4	1.0
-CRUK0810	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1	10	9,10,11,12,13,14,15,16,17,18	10,11,12,13,14,15,16	10	
+CRUK0810	p.lymphnode1,p.lymphnode2,p.lymphnode3,p.lymphnode4,relapse1	10	9,10,11,12,13,14,15,16,17,18	9,10,11,12,13,14,15,16,17,18	10	
 CRUK0817	relapse1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
 CRUK0872	p.lymphnode1	1	1,2,3,4,5	1,2,3,4,5	1	1.0
