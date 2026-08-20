@@ -11,10 +11,12 @@ for filename in sys.argv[1:]:
     person = m.group()
 
     migrations = 0
+    comigrations = 0
     with open(filename) as fh:
         for line in fh:
             _, _, mig = line.split()
             mig = int(mig)
             if mig >= 0:
+                comigrations = max(comigrations, mig + 1)
                 migrations += 1
-    print(person, migrations, sep="\t")
+    print(person, migrations, comigrations, sep="\t")
