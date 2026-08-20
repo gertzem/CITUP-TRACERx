@@ -12,8 +12,10 @@ for filename in sys.argv[1:]:
 
     score = "NA"
     migrations = "NA"
+    tree = []
     reading_score = False
-    reading_migrations = True
+    reading_migrations = False
+    reading_tree = False
     with open(filename) as fh:
         for line in fh:
             if reading_score:
@@ -22,12 +24,22 @@ for filename in sys.argv[1:]:
             elif reading_migrations:
                 migrations = line.rstrip()
                 reading_migrations = False
+            elif reading_tree:
+                stripped_line = line.rstrip()
+                if stripped_line == '':
+                    reading_tree = False
+                    continue
+                tree.append(stripped_line)
             elif line.startswith("TREE_SCORE_NO_REWARD"):
                 reading_score = True
             elif line.startswith("MIKE_MIGRATION_SCORE"):
                 reading_migrations = True
+            elif line.startswith('PARENT_NODE'):
+                reading_tree = True
             else:
                 reading_score = False
                 reading_migrations = False
+                reading_tree = False
+    tree_digest = hashlib.md5('\n'.join(tree).encode("utf-8")).hexdigest()
 
     print(person, migrations, score, sep="\t")
