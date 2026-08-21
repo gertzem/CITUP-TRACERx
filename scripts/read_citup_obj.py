@@ -1,5 +1,6 @@
 import sys
 import re
+import hashlib
 
 cruk = re.compile(r"CRUK\d+")
 
@@ -42,4 +43,4 @@ for filename in sys.argv[1:]:
                 reading_tree = False
     tree_digest = hashlib.md5('\n'.join(tree).encode("utf-8")).hexdigest()
 
-    print(person, migrations, score, sep="\t")
+    print(person, migrations, score, tree_digest, sep="\t")

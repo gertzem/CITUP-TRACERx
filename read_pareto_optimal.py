@@ -6,8 +6,6 @@ samples = pd.DataFrame(json.loads(snakemake.params.samples))
 
 arglist = []
 for _, sample in samples.iterrows():
-    if sample.person == 'CRUK0484':
-        continue
     arglist.append(f"results/citup_scan_mets/conipher/mig_{sample['argmin']:03}/{sample.person}/{sample.person}.mig_{sample['argmin']:03}.tree_0.txt")
 
 with open(snakemake.output[0], 'w') as fh:
