@@ -1,23 +1,26 @@
-#!/usr/bin/env python3
-
+import re
 import sys
-from pathlib import Path
 
+import pandas as pd
+
+cruk = re.compile(r"CRUK\d+")
+epsilon = 1e-4
+tau = 1.05
+
+optima = []
 for filename in sys.argv[1:]:
-    min_value = float("inf")
-    argmin = None
+    m = cruk.search(filename)
+    if not m:
+        print("Cannot read", filename)
+        sys.exit(0)
+    person = m.group()
+    scores = pd.read_csv(filename, sep="\t", names=["migration", "tree_score"])
+    best_tree_score = scores.tree_score.min()
+    upper_limit = tau * (best_tree_score + epsilon)
+    good_scores = scores.query("tree_score <= @upper_limit")
+    i = good_scores.migration.argmin()
 
-    with open(filename, "r") as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
+    optima.append((person, good_scores.migration.iloc[i], good_scores.tree_score.iloc[i]))
 
-            i, m = line.split()
-            m = float(m)  # Use int(m) if the second column is always an integer
-
-            if m < min_value:
-                min_value = m
-                argmin = i
-
-    print(Path(filename).parent, argmin, min_value, sep="\t")
+for person, migration, tree_score in sorted(optima):
+    print(person, migration, tree_score, sep="\t")
