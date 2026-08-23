@@ -25,8 +25,6 @@ both = us.merge(them, on='person', suffixes=("_us", "_them"))
 
 mach2 = pd.read_csv('results/summary/mach2_migrations.tsv', sep="\t", names=["person", "migrations_mach2", "comigrations_mach2"])
 
-mach2
-
 cmp = both.merge(mach2, on='person').set_index('person', drop=False)
 
 
@@ -95,5 +93,27 @@ cmp.query('migrations_cmp == "migrations_better"')
 cmp.query('tree_us == tree_them').shape[0]
 
 cmp.query('tree_us == tree_them & quad_us == quad_them').shape[0]
+
+cmp = cmp.set_index('person', drop=False)
+
+cmp.loc[['CRUK0530', 'CRUK0572']]
+
+mach2_worse = cmp.query('mach2_cmp == "0mach2_worse" & quad_us == quad_them').copy()
+
+mach2_worse['same_tree'] = mach2_worse['tree_us'] == mach2_worse['tree_them']
+
+mach2_worse[['person', 'migrations_us', 'migrations_mach2', 'same_tree']]
+
+# mach2_rel_worse = cmp.query('mach2_cmp == "0mach2_worse" & tree_score_relcmp = "').copy()
+
+mach2_relworse = cmp.query('mach2_cmp == "0mach2_worse" & tree_score_relcmp == "score_same"').copy()
+
+mach2_relworse['same_tree'] = mach2_relworse['tree_us'] == mach2_relworse['tree_them']
+
+mach2_relworse[['person', 'migrations_us', 'migrations_mach2', 'same_tree']]
+
+cmp.loc['CRUK0311']
+
+cmp.loc['CRUK0620']
 
 
