@@ -23,7 +23,7 @@ them = pd.read_csv('results/citup2_mets/conipher/optima.tsv',
 
 both = us.merge(them, on='person', suffixes=("_us", "_them"))
 
-mach2 = pd.read_csv('results/summary/mach2_migrations.tsv', sep="\t", names=["person", "migrations_mach2", "comigrations_mach2"])
+mach2 = pd.read_csv('results/summary/mach2_migrations.tsv', sep="\t", names=["person", "migrations_mach2", "comigrations_mach2", "is_dag"])
 
 cmp = both.merge(mach2, on='person').set_index('person', drop=False)
 
@@ -101,6 +101,10 @@ cmp.query('migrations_cmp == "migrations_worse" & mach2_cmp == "2mach2_better"')
 
 cmp.query('migrations_cmp == "migrations_better"')
 
+mach2
+
+both
+
 cmp.query('tree_us == tree_them').shape[0]
 
 cmp.query('tree_us == tree_them & quad_us == quad_them').shape[0]
@@ -127,7 +131,7 @@ mach2_same = cmp.query('mach2_cmp == "1mach2_same"')
 
 pd.crosstab(mach2_same['mach2_comigrations_cmp'],mach2_same['tree_score_cmp'])
 
-mach2_same.query('mach2_comigrations_cmp == "2mach2_better" & tree_score_cmp == "score_same"')[['person', 'migrations_us', 'comigrations_us', 'quad_us', 'migrations_mach2', 'comigrations_mach2', 'quad_them', 'tree_us', 'tree_them']].to_csv('temp.csv')
+mach2_same.query('mach2_comigrations_cmp == "2mach2_better_cm" & tree_score_cmp == "score_same"')[['person', 'migrations_us', 'comigrations_us', 'quad_us', 'migrations_mach2', 'comigrations_mach2', 'quad_them', 'tree_us', 'tree_them']]
 
 us = us.set_index('person', drop=False)
 
@@ -148,5 +152,11 @@ fixed_cmp['mach2_cmp'] = cmp.apply(lambda r: mach2_cmp(r['migrations_them'], r['
 pd.crosstab(fixed_cmp['mach2_cmp'], fixed_cmp['mach2_comigrations_cmp'])
 
 fixed_cmp['mach2_cmp'].value_counts()
+
+mach2.is_dag.value_counts()
+
+cmp
+
+len(cmp['mach2_cmp'])
 
 
