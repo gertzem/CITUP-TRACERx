@@ -7,7 +7,7 @@ configfile: "config.yaml"
 SAMPLESHEET = pd.read_csv("samplesheet.tsv", sep="\t", comment="#")
 
 
-rule citup2_mets:
+rule optimize_fixed_tree:
     output:
         directory("results/citup2_mets/{model}/{person}/trees"),
     input:
@@ -45,7 +45,7 @@ rule citup2_mets:
         """
 
 
-rule citup2_optimal_mets:
+rule rerun_with_optimal_migrations:
     output:
         directory("results/citup_scan_mets/{model}/pareto/{person}/trees"),
     input:
@@ -84,7 +84,7 @@ rule citup2_optimal_mets:
 
 
 
-rule citup2_free_mets:
+rule optimize_with_penalty:
     output:
         directory("results/citup2_free_mets/{model}/{person}/trees"),
     input:
@@ -118,34 +118,7 @@ rule citup2_free_mets:
         """
 
 
-rule citup_migration:
-    output:
-        "results/citup_scan/{model}/{person}/trees/mig{migrations}.treeScores.tsv",
-    input:
-        "data/tracerx/{person}/mutations.tsv",
-        "data/tracerx/{person}/sites.tsv",
-    params:
-        args=lambda w: config["citup_scan"][w.model]["args"],
-        citup_py=lambda w: config["citup_scan"][w.model]["citup_py"],
-        numSolutions=lambda w: config["citup_scan"][w.model]["num_solutions"],
-    resources:
-        runtime=960,
-        mem_mb=16 * 1024,
-    threads: 8
-    shell:
-        """
-        output={output}
-        prefix=${{output%.treeScores.tsv}}
-        python {params.citup_py} \
-            -f {input[0]} \
-            --sites-file {input[1]} \
-            -o $prefix \
-            --numSolutions {params.numSolutions} \
-            --mike-max-migrations {wildcards.migrations} \
-            {params.args} --gurobi-threads {threads}
-        """
-
-rule citup_pareto_mets:
+rule read_migration_scan:
     output:
         "results/citup_scan_mets/{method}/pareto/{person}/pareto.txt",
     input:
@@ -159,7 +132,7 @@ rule citup_pareto_mets:
         python scripts/pareto_front.py {input} > {output}
         """
 
-rule citup_migration_mets:
+rule optimize_for_fixed_migrations:
     output:
         "results/citup_scan_mets/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
     input:
@@ -191,7 +164,7 @@ rule citup_migration_mets:
             {params.args} --gurobi-threads {threads}
         """
 
-rule plot_one_mets_scan:
+rule plot_for_fixed_migrations:
     output:
         directory("results/citup_scan_mets/{model}/mig_{migrations}/{person}/plots"),
     input:
@@ -211,7 +184,7 @@ rule plot_one_mets_scan:
             --all-mike-dag-colorings
         """
 
-rule plot_one_mets_fixed:
+rule plot_for_fixed_tree:
     output:
         directory("results/citup2_mets/{model}/{person}/plots"),
     input:
@@ -232,33 +205,7 @@ rule plot_one_mets_fixed:
         """
 
 
-rule citup_conipher_free:
-    input:
-        expand("results/citup2/conipher/{person}/trees", person=SAMPLESHEET.person),
-
-
-rule citup_conipher_optima:
-    output: 
-        "results/citup2/conipher/optima.tsv",
-    input:
-        expand("results/citup2/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
-    shell:
-        """
-        python scripts/read_citup_obj.py {input} > {output}
-        """
-
-rule citup_conipher_fixed_optima:
-    output: 
-        "results/citup2_fixed/conipher/optima.tsv",
-    input:
-        expand("results/citup2/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
-    shell:
-        """
-        python scripts/read_citup_obj.py {input} > {output}
-        """
-
-
-rule citup_conipher_fixed_mets_optima:
+rule read_fixed_tree_optima:
     output: 
         "results/citup2_mets/conipher/optima.tsv",
     input:
@@ -269,7 +216,7 @@ rule citup_conipher_fixed_mets_optima:
         """
 
 
-rule citup_conipher_free_mets_optima:
+rule read_optima_with_penalty:
     output: 
         "results/citup2_free_mets/conipher/optima.tsv",
     input:
@@ -281,52 +228,22 @@ rule citup_conipher_free_mets_optima:
         """
 
 
-rule citup_mets_optimal:
+rule perform_migration_scan:
     input:
         expand("results/citup_scan_mets/conipher/pareto/{person}/trees", 
                 person=SAMPLESHEET.query('~argmin.isna()').person),
 
 
-rule citup_conipher_fixed:
-    input:
-        expand(
-            "results/citup2_fixed/conipher/{person}/trees", person=SAMPLESHEET.person
-        ),
-
-
-rule citup_conipher_mets:
+rule rescore_fixed_trees:
     input:
         expand("results/citup2_mets/conipher/{person}/trees", person=SAMPLESHEET.person),
 
 
 
-rule citup_conipher_free_mets:
+rule build_penalty_trees:
     input:
         expand(
             "results/citup2_free_mets/conipher/{person}/trees",
-            person=SAMPLESHEET.person,
-        ),
-
-
-rule citup_conipher_pareto:
-    input:
-        expand(
-            "results/citup_scan/conipher/{person}/trees/pareto.txt",
-            person=SAMPLESHEET.person,
-        ),
-
-rule citup_mig8a_pareto:
-    input:
-        expand(
-            "results/citup_scan/mig8a/{person}/trees/pareto.txt",
-            person=SAMPLESHEET.person,
-        ),
-
-
-rule citup_mig8_pareto:
-    input:
-        expand(
-            "results/citup_scan/mig8/{person}/trees/pareto.txt",
             person=SAMPLESHEET.person,
         ),
 
@@ -339,7 +256,7 @@ rule citup_conipher_pareto_mets:
         ),
 
 
-rule read_pareto_optimal:
+rule read_pareto_fronts:
     output:
         "results/citup_scan_mets/conipher/pareto/optima.tsv"
     input: 
