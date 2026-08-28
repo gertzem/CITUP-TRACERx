@@ -45,43 +45,39 @@ rule optimize_fixed_tree:
         """
 
 
-rule rerun_with_optimal_migrations:
+rule read_fixed_tree_optima:
     output:
-        directory("results/citup_scan_mets/{model}/pareto/{person}/trees"),
+        "results/citup2_mets/conipher/optima.tsv",
     input:
-        mutations="data/tracerx/{person}/mutations.tsv",
-        sites="data/tracerx/{person}/sites.tsv",
-    params:
-        args=lambda w: config["citup_optimal"][w.model]["args"],
-        citup_py=lambda w: config["citup_optimal"][w.model]["citup_py"],
-        numSolutions=lambda w: config["citup_optimal"][w.model]["num_solutions"],
-        dagSolutions=lambda w: config["citup_optimal"][w.model]["dag_solutions"],
-        metastatic_sites=lambda w: SAMPLESHEET.query(
-            "person == @w.person"
-        ).metastases.iloc[0],
-        argmin=lambda w: int(SAMPLESHEET.query(
-            "person == @w.person"
-        ).argmin.iloc[0]),
-    resources:
-        runtime=24 * 60,
-        mem_mb=8 * 1024,
-    threads: 8
+        expand(
+            "results/citup2_mets/conipher/{person}/trees/{person}.tree_0.txt",
+            person=SAMPLESHEET.person,
+        ),
     shell:
         """
-        outdir={output[0]}
-        mkdir -p $outdir
-        outprefix="$outdir/{wildcards.person}"
-        python {params.citup_py} \\
-            -f {input.mutations} \\
-            --sites-file {input.sites} \\
-            --metastatic-sites {params.metastatic_sites} \\
-            -o $outprefix \\
-            --enum-max-trees {params.dagSolutions} \\
-            --numSolutions {params.numSolutions} \\
-            --mike-max-migrations {params.argmin} \\
-            {params.args} --gurobi-threads {threads}
+        python scripts/read_citup_obj.py {input} > {output}
         """
 
+
+rule plot_for_fixed_tree:
+    output:
+        directory("results/citup2_mets/{model}/{person}/plots"),
+    input:
+        "results/citup2_mets/{model}/{person}/trees",
+        "data/tracerx/{person}/sites.tsv",
+    localrule: True
+    shell:
+        """
+        mkdir -p {output}
+        indir={input[0]}
+
+        python ../CITUP/plot_with_gene_names.py "$indir" \\
+            --output-dir {output} \\
+            --sample-sites {input[1]} \\
+            --with-site-transitions \\
+            --with_node_info \\
+            --all-mike-dag-colorings
+        """
 
 
 rule optimize_with_penalty:
@@ -118,21 +114,21 @@ rule optimize_with_penalty:
         """
 
 
-rule read_migration_scan:
+rule read_optima_with_penalty:
     output:
-        "results/citup_scan_mets/{method}/pareto/{person}/pareto.txt",
+        "results/citup2_free_mets/conipher/optima.tsv",
     input:
-        lambda w: expand(
-            "results/citup_scan_mets/{{method}}/mig_{migrations:03d}/{{person}}/{{person}}.mig_{migrations:03d}.treeScores.tsv",
-            migrations=[int(m) for m in SAMPLESHEET.query("person==@w.person").tests.iloc[0].split(",")],
+        expand(
+            "results/citup2_free_mets/conipher/{person}/trees/{person}.tree_0.txt",
+            person=SAMPLESHEET.query("~free_mets_optima.isna()").person,
         ),
-    localrule: True
     shell:
         """
-        python scripts/pareto_front.py {input} > {output}
+        python scripts/read_citup_obj.py {input} > {output}
         """
 
-rule optimize_for_fixed_migrations:
+
+rule scan_for_target_migrations:
     output:
         "results/citup_scan_mets/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
     input:
@@ -164,7 +160,8 @@ rule optimize_for_fixed_migrations:
             {params.args} --gurobi-threads {threads}
         """
 
-rule plot_for_fixed_migrations:
+
+rule plot_for_target_migrations:
     output:
         directory("results/citup_scan_mets/{model}/mig_{migrations}/{person}/plots"),
     input:
@@ -184,63 +181,77 @@ rule plot_for_fixed_migrations:
             --all-mike-dag-colorings
         """
 
-rule plot_for_fixed_tree:
+
+rule read_migration_scan:
     output:
-        directory("results/citup2_mets/{model}/{person}/plots"),
+        "results/citup_scan_mets/{method}/pareto/{person}/pareto.txt",
     input:
-        "results/citup2_mets/{model}/{person}/trees",
-        "data/tracerx/{person}/sites.tsv",
+        lambda w: expand(
+            "results/citup_scan_mets/{{method}}/mig_{migrations:03d}/{{person}}/{{person}}.mig_{migrations:03d}.treeScores.tsv",
+            migrations=[
+                int(m)
+                for m in SAMPLESHEET.query("person==@w.person")
+                .tests.iloc[0]
+                .split(",")
+            ],
+        ),
     localrule: True
     shell:
         """
-        mkdir -p {output}
-        indir={input[0]}
-
-        python ../CITUP/plot_with_gene_names.py "$indir" \\
-            --output-dir {output} \\
-            --sample-sites {input[1]} \\
-            --with-site-transitions \\
-            --with_node_info \\
-            --all-mike-dag-colorings
+        python scripts/pareto_front.py {input} > {output}
         """
 
 
-rule read_fixed_tree_optima:
-    output: 
-        "results/citup2_mets/conipher/optima.tsv",
+rule rerun_with_optimal_migrations:
+    output:
+        directory("results/citup_scan_mets/{model}/pareto/{person}/trees"),
     input:
-        expand("results/citup2_mets/conipher/{person}/trees/{person}.tree_0.txt", person=SAMPLESHEET.person),
+        mutations="data/tracerx/{person}/mutations.tsv",
+        sites="data/tracerx/{person}/sites.tsv",
+    params:
+        args=lambda w: config["citup_optimal"][w.model]["args"],
+        citup_py=lambda w: config["citup_optimal"][w.model]["citup_py"],
+        numSolutions=lambda w: config["citup_optimal"][w.model]["num_solutions"],
+        dagSolutions=lambda w: config["citup_optimal"][w.model]["dag_solutions"],
+        metastatic_sites=lambda w: SAMPLESHEET.query(
+            "person == @w.person"
+        ).metastases.iloc[0],
+        argmin=lambda w: int(SAMPLESHEET.query("person == @w.person").argmin.iloc[0]),
+    resources:
+        runtime=24 * 60,
+        mem_mb=8 * 1024,
+    threads: 8
     shell:
         """
-        python scripts/read_citup_obj.py {input} > {output}
+        outdir={output[0]}
+        mkdir -p $outdir
+        outprefix="$outdir/{wildcards.person}"
+        python {params.citup_py} \\
+            -f {input.mutations} \\
+            --sites-file {input.sites} \\
+            --metastatic-sites {params.metastatic_sites} \\
+            -o $outprefix \\
+            --enum-max-trees {params.dagSolutions} \\
+            --numSolutions {params.numSolutions} \\
+            --mike-max-migrations {params.argmin} \\
+            {params.args} --gurobi-threads {threads}
         """
 
 
-rule read_optima_with_penalty:
-    output: 
-        "results/citup2_free_mets/conipher/optima.tsv",
+rule optimal_rerun_all:
     input:
-        expand("results/citup2_free_mets/conipher/{person}/trees/{person}.tree_0.txt", 
-                person=SAMPLESHEET.query('~free_mets_optima.isna()').person),
-    shell:
-        """
-        python scripts/read_citup_obj.py {input} > {output}
-        """
+        expand(
+            "results/citup_scan_mets/conipher/pareto/{person}/trees",
+            person=SAMPLESHEET.query("~argmin.isna()").person,
+        ),
 
 
-rule perform_migration_scan:
-    input:
-        expand("results/citup_scan_mets/conipher/pareto/{person}/trees", 
-                person=SAMPLESHEET.query('~argmin.isna()').person),
-
-
-rule rescore_fixed_trees:
+rule fixed_trees_all:
     input:
         expand("results/citup2_mets/conipher/{person}/trees", person=SAMPLESHEET.person),
 
 
-
-rule build_penalty_trees:
+rule penalty_trees_all:
     input:
         expand(
             "results/citup2_free_mets/conipher/{person}/trees",
@@ -248,7 +259,7 @@ rule build_penalty_trees:
         ),
 
 
-rule citup_conipher_pareto_mets:
+rule pareto_fronts_all:
     input:
         expand(
             "results/citup_scan_mets/conipher/pareto/{person}/pareto.txt",
@@ -256,10 +267,10 @@ rule citup_conipher_pareto_mets:
         ),
 
 
-rule read_pareto_fronts:
+rule read_pareto_optima_all:
     output:
-        "results/citup_scan_mets/conipher/pareto/optima.tsv"
-    input: 
+        "results/citup_scan_mets/conipher/pareto/optima.tsv",
+    input:
         expand(
             "results/citup_scan_mets/conipher/pareto/{person}/pareto.txt",
             person=SAMPLESHEET.person,
