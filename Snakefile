@@ -9,7 +9,7 @@ SAMPLESHEET = pd.read_csv("samplesheet.tsv", sep="\t", comment="#")
 
 rule optimize_fixed_tree:
     output:
-        directory("results/citup2_mets/{model}/{person}/trees"),
+        directory("results/fixed_trees/{model}/{person}/trees"),
     input:
         mutations="data/tracerx/{person}/mutations.tsv",
         sites="data/tracerx/{person}/sites.tsv",
@@ -47,10 +47,10 @@ rule optimize_fixed_tree:
 
 rule read_fixed_tree_optima:
     output:
-        "results/citup2_mets/conipher/optima.tsv",
+        "results/fixed_trees/conipher/optima.tsv",
     input:
         expand(
-            "results/citup2_mets/conipher/{person}/trees/{person}.tree_0.txt",
+            "results/fixed_trees/conipher/{person}/trees/{person}.tree_0.txt",
             person=SAMPLESHEET.person,
         ),
     shell:
@@ -61,9 +61,9 @@ rule read_fixed_tree_optima:
 
 rule plot_for_fixed_tree:
     output:
-        directory("results/citup2_mets/{model}/{person}/plots"),
+        directory("results/fixed_trees/{model}/{person}/plots"),
     input:
-        "results/citup2_mets/{model}/{person}/trees",
+        "results/fixed_trees/{model}/{person}/trees",
         "data/tracerx/{person}/sites.tsv",
     localrule: True
     shell:
@@ -82,7 +82,7 @@ rule plot_for_fixed_tree:
 
 rule optimize_with_penalty:
     output:
-        directory("results/citup2_free_mets/{model}/{person}/trees"),
+        directory("results/penalty_trees/{model}/{person}/trees"),
     input:
         mutations="data/tracerx/{person}/mutations.tsv",
         sites="data/tracerx/{person}/sites.tsv",
@@ -116,10 +116,10 @@ rule optimize_with_penalty:
 
 rule read_optima_with_penalty:
     output:
-        "results/citup2_free_mets/conipher/optima.tsv",
+        "results/penalty_trees/conipher/optima.tsv",
     input:
         expand(
-            "results/citup2_free_mets/conipher/{person}/trees/{person}.tree_0.txt",
+            "results/penalty_trees/conipher/{person}/trees/{person}.tree_0.txt",
             person=SAMPLESHEET.query("~free_mets_optima.isna()").person,
         ),
     shell:
@@ -130,7 +130,7 @@ rule read_optima_with_penalty:
 
 rule scan_for_target_migrations:
     output:
-        "results/citup_scan_mets/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
+        "results/migration_scan/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
     input:
         "data/tracerx/{person}/mutations.tsv",
         "data/tracerx/{person}/sites.tsv",
@@ -163,9 +163,9 @@ rule scan_for_target_migrations:
 
 rule plot_for_target_migrations:
     output:
-        directory("results/citup_scan_mets/{model}/mig_{migrations}/{person}/plots"),
+        directory("results/migration_scan/{model}/mig_{migrations}/{person}/plots"),
     input:
-        "results/citup_scan_mets/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
+        "results/migration_scan/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
         "data/tracerx/{person}/sites.tsv",
     localrule: True
     shell:
@@ -184,10 +184,10 @@ rule plot_for_target_migrations:
 
 rule read_migration_scan:
     output:
-        "results/citup_scan_mets/{method}/pareto/{person}/pareto.txt",
+        "results/migration_scan/{method}/pareto/{person}/pareto.txt",
     input:
         lambda w: expand(
-            "results/citup_scan_mets/{{method}}/mig_{migrations:03d}/{{person}}/{{person}}.mig_{migrations:03d}.treeScores.tsv",
+            "results/migration_scan/{{method}}/mig_{migrations:03d}/{{person}}/{{person}}.mig_{migrations:03d}.treeScores.tsv",
             migrations=[
                 int(m)
                 for m in SAMPLESHEET.query("person==@w.person")
@@ -204,7 +204,7 @@ rule read_migration_scan:
 
 rule rerun_with_optimal_migrations:
     output:
-        directory("results/citup_scan_mets/{model}/pareto/{person}/trees"),
+        directory("results/migration_scan/{model}/pareto/{person}/trees"),
     input:
         mutations="data/tracerx/{person}/mutations.tsv",
         sites="data/tracerx/{person}/sites.tsv",
@@ -241,20 +241,20 @@ rule rerun_with_optimal_migrations:
 rule optimal_rerun_all:
     input:
         expand(
-            "results/citup_scan_mets/conipher/pareto/{person}/trees",
+            "results/migration_scan/conipher/pareto/{person}/trees",
             person=SAMPLESHEET.query("~argmin.isna()").person,
         ),
 
 
 rule fixed_trees_all:
     input:
-        expand("results/citup2_mets/conipher/{person}/trees", person=SAMPLESHEET.person),
+        expand("results/fixed_trees/conipher/{person}/trees", person=SAMPLESHEET.person),
 
 
 rule penalty_trees_all:
     input:
         expand(
-            "results/citup2_free_mets/conipher/{person}/trees",
+            "results/penalty_trees/conipher/{person}/trees",
             person=SAMPLESHEET.person,
         ),
 
@@ -262,17 +262,17 @@ rule penalty_trees_all:
 rule pareto_fronts_all:
     input:
         expand(
-            "results/citup_scan_mets/conipher/pareto/{person}/pareto.txt",
+            "results/migration_scan/conipher/pareto/{person}/pareto.txt",
             person=SAMPLESHEET.person,
         ),
 
 
 rule read_pareto_optima_all:
     output:
-        "results/citup_scan_mets/conipher/pareto/optima.tsv",
+        "results/migration_scan/conipher/pareto/optima.tsv",
     input:
         expand(
-            "results/citup_scan_mets/conipher/pareto/{person}/pareto.txt",
+            "results/migration_scan/conipher/pareto/{person}/pareto.txt",
             person=SAMPLESHEET.person,
         ),
     params:
