@@ -4,8 +4,8 @@ import sys
 import pandas as pd
 
 cruk = re.compile(r"CRUK\d+")
-epsilon = 1e-4
-tau = 1.05
+epsilon = 1e-3
+tau = 1.1
 
 optima = []
 for filename in sys.argv[1:]:
