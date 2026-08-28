@@ -288,6 +288,26 @@ rule plot_one_mets_scan:
             --all-mike-dag-colorings
         """
 
+rule plot_one_mets_fixed:
+    output:
+        directory("results/citup2_mets/{model}/{person}/plots"),
+    input:
+        "results/citup2_mets/{model}/{person}/trees",
+        "data/tracerx/{person}/sites.tsv",
+    localrule: True
+    shell:
+        """
+        mkdir -p {output}
+        indir={input[0]}
+
+        python ../CITUP/plot_with_gene_names.py "$indir" \\
+            --output-dir {output} \\
+            --sample-sites {input[1]} \\
+            --with-site-transitions \\
+            --with_node_info \\
+            --all-mike-dag-colorings
+        """
+
 
 rule citup_conipher_free:
     input:
