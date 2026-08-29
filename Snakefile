@@ -5,8 +5,15 @@ configfile: "config.yaml"
 
 
 SAMPLESHEET = pd.read_csv(config["samplesheet"], sep="\t", comment="#")
+SAMPLESHEET = SAMPLESHEET.set_index('person', drop=False)
 COHORT = config["cohort"]
 
+def metastatic_sites_option(person):
+    sites = SAMPLESHEET.loc[person, 'metastases']
+    if sites:
+        return f'--metastatic-sites {sites}'
+    else: 
+        return ''
 
 rule optimize_fixed_tree:
     output:
@@ -20,9 +27,7 @@ rule optimize_fixed_tree:
         args=lambda w: config["citup2"][w.cohort]["args"],
         citup_py=lambda w: config["citup2"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup2"][w.cohort]["num_solutions"],
-        metastatic_sites=lambda w: SAMPLESHEET.query(
-            "person == @w.person"
-        ).metastases.iloc[0],
+        metastatic_sites = lambda w: metastatic_sites_option(w.person),
     resources:
         runtime=960,
         mem_mb=8 * 1024,
@@ -38,8 +43,7 @@ rule optimize_fixed_tree:
             -f {input.mutations} \\
             --sites-file {input.sites} \\
             --fixed-B-file {input.B} \\
-            --fixed-delta-file {input.delta} \\
-            --metastatic-sites {params.metastatic_sites} \\
+            --fixed-delta-file {input.delta} {params.metastatic_sites} \\
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
             {params.args} --gurobi-threads {threads}
@@ -91,9 +95,7 @@ rule optimize_with_penalty:
         args=lambda w: config["citup2"][w.cohort]["args"],
         citup_py=lambda w: config["citup2"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup2"][w.cohort]["num_solutions"],
-        metastatic_sites=lambda w: SAMPLESHEET.query(
-            "person == @w.person"
-        ).metastases.iloc[0],
+        metastatic_sites = lambda w: metastatic_sites_option(w.person),
     resources:
         runtime=48 * 60,
         mem_mb=8 * 1024,
@@ -107,8 +109,7 @@ rule optimize_with_penalty:
         outprefix="$outdir/{wildcards.person}"
         python {params.citup_py} \\
             -f {input.mutations} \\
-            --sites-file {input.sites} \\
-            --metastatic-sites {params.metastatic_sites} \\
+            --sites-file {input.sites} {params.metastatic_sites} \\
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
             {params.args} --gurobi-threads {threads}
@@ -140,9 +141,7 @@ rule scan_for_target_migrations:
         args=lambda w: config["citup_scan"][w.cohort]["args"],
         citup_py=lambda w: config["citup_scan"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup_scan"][w.cohort]["num_solutions"],
-        metastatic_sites=lambda w: SAMPLESHEET.query(
-            "person == @w.person"
-        ).metastases.iloc[0],
+        metastatic_sites = lambda w: metastatic_sites_option(w.person),
         max_migrations=lambda w: int(w.migrations),
     resources:
         runtime=24 * 60,
@@ -155,8 +154,7 @@ rule scan_for_target_migrations:
         python {params.citup_py} \\
             -f {input[0]} \\
             --sites-file {input[1]} \\
-            -o $prefix \\
-            --metastatic-sites {params.metastatic_sites} \\
+            -o $prefix {params.metastatic_sites} \\
             --numSolutions {params.numSolutions} \\
             --mike-max-migrations {params.max_migrations} \\
             {params.args} --gurobi-threads {threads}
@@ -215,9 +213,7 @@ rule rerun_with_optimal_migrations:
         citup_py=lambda w: config["citup_optimal"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup_optimal"][w.cohort]["num_solutions"],
         dagSolutions=lambda w: config["citup_optimal"][w.cohort]["dag_solutions"],
-        metastatic_sites=lambda w: SAMPLESHEET.query(
-            "person == @w.person"
-        ).metastases.iloc[0],
+        metastatic_sites = lambda w: metastatic_sites_option(w.person),
         argmin=lambda w: int(SAMPLESHEET.query("person == @w.person").argmin.iloc[0]),
     resources:
         runtime=24 * 60,
@@ -230,8 +226,7 @@ rule rerun_with_optimal_migrations:
         outprefix="$outdir/{wildcards.person}"
         python {params.citup_py} \\
             -f {input.mutations} \\
-            --sites-file {input.sites} \\
-            --metastatic-sites {params.metastatic_sites} \\
+            --sites-file {input.sites} {params.metastatic_sites} \\
             -o $outprefix \\
             --enum-max-trees {params.dagSolutions} \\
             --numSolutions {params.numSolutions} \\
