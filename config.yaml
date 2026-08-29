@@ -1,5 +1,7 @@
+samplesheet: "samplesheet-tracerx.tsv"
+cohort: "tracerx"
 citup2:
-  conipher:
+  tracerx:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
     dag_solutions: 1
@@ -21,7 +23,7 @@ citup2:
       --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
 citup_scan:
-  conipher:
+  tracerx:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
     dag_solutions: 1
@@ -71,7 +73,7 @@ citup_scan:
       --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
 citup_optimal:
-  conipher:
+  tracerx:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 10
     dag_solutions: 10

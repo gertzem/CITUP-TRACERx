@@ -4,21 +4,22 @@ import pandas as pd
 configfile: "config.yaml"
 
 
-SAMPLESHEET = pd.read_csv("samplesheet.tsv", sep="\t", comment="#")
+SAMPLESHEET = pd.read_csv(config["samplesheet"], sep="\t", comment="#")
+COHORT = config["cohort"]
 
 
 rule optimize_fixed_tree:
     output:
-        directory("results/fixed_trees/{model}/{person}/trees"),
+        directory("results/fixed_trees/{cohort}/{person}/trees"),
     input:
-        mutations="data/tracerx/{person}/mutations.tsv",
-        sites="data/tracerx/{person}/sites.tsv",
-        B="data/tracerx/{person}/fixed_B.tsv",
-        delta="data/tracerx/{person}/fixed_delta.tsv",
+        mutations="data/{cohort}/{person}/mutations.tsv",
+        sites="data/{cohort}/{person}/sites.tsv",
+        B="data/{cohort}/{person}/fixed_B.tsv",
+        delta="data/{cohort}/{person}/fixed_delta.tsv",
     params:
-        args=lambda w: config["citup2"][w.model]["args"],
-        citup_py=lambda w: config["citup2"][w.model]["citup_py"],
-        numSolutions=lambda w: config["citup2"][w.model]["num_solutions"],
+        args=lambda w: config["citup2"][w.cohort]["args"],
+        citup_py=lambda w: config["citup2"][w.cohort]["citup_py"],
+        numSolutions=lambda w: config["citup2"][w.cohort]["num_solutions"],
         metastatic_sites=lambda w: SAMPLESHEET.query(
             "person == @w.person"
         ).metastases.iloc[0],
@@ -47,10 +48,10 @@ rule optimize_fixed_tree:
 
 rule read_fixed_tree_optima:
     output:
-        "results/fixed_trees/conipher/optima.tsv",
+        "results/fixed_trees/{cohort}/optima.tsv",
     input:
-        expand(
-            "results/fixed_trees/conipher/{person}/trees/{person}.tree_0.txt",
+        lambda w: expand(
+            "results/fixed_trees/{w.cohort}/{person}/trees/{person}.tree_0.txt",
             person=SAMPLESHEET.person,
         ),
     shell:
@@ -61,10 +62,10 @@ rule read_fixed_tree_optima:
 
 rule plot_for_fixed_tree:
     output:
-        directory("results/fixed_trees/{model}/{person}/plots"),
+        directory("results/fixed_trees/{cohort}/{person}/plots"),
     input:
-        "results/fixed_trees/{model}/{person}/trees",
-        "data/tracerx/{person}/sites.tsv",
+        "results/fixed_trees/{cohort}/{person}/trees",
+        "data/{cohort}/{person}/sites.tsv",
     localrule: True
     shell:
         """
@@ -82,14 +83,14 @@ rule plot_for_fixed_tree:
 
 rule optimize_with_penalty:
     output:
-        directory("results/penalty_trees/{model}/{person}/trees"),
+        directory("results/penalty_trees/{cohort}/{person}/trees"),
     input:
-        mutations="data/tracerx/{person}/mutations.tsv",
-        sites="data/tracerx/{person}/sites.tsv",
+        mutations="data/{cohort}/{person}/mutations.tsv",
+        sites="data/{cohort}/{person}/sites.tsv",
     params:
-        args=lambda w: config["citup2"][w.model]["args"],
-        citup_py=lambda w: config["citup2"][w.model]["citup_py"],
-        numSolutions=lambda w: config["citup2"][w.model]["num_solutions"],
+        args=lambda w: config["citup2"][w.cohort]["args"],
+        citup_py=lambda w: config["citup2"][w.cohort]["citup_py"],
+        numSolutions=lambda w: config["citup2"][w.cohort]["num_solutions"],
         metastatic_sites=lambda w: SAMPLESHEET.query(
             "person == @w.person"
         ).metastases.iloc[0],
@@ -116,10 +117,11 @@ rule optimize_with_penalty:
 
 rule read_optima_with_penalty:
     output:
-        "results/penalty_trees/conipher/optima.tsv",
+        "results/penalty_trees/{cohort}/optima.tsv",
     input:
+        lambda w:
         expand(
-            "results/penalty_trees/conipher/{person}/trees/{person}.tree_0.txt",
+            "results/penalty_trees/{w.cohort}/{person}/trees/{person}.tree_0.txt",
             person=SAMPLESHEET.query("~free_mets_optima.isna()").person,
         ),
     shell:
@@ -130,14 +132,14 @@ rule read_optima_with_penalty:
 
 rule scan_for_target_migrations:
     output:
-        "results/migration_scan/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
+        "results/migration_scan/{cohort}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
     input:
-        "data/tracerx/{person}/mutations.tsv",
-        "data/tracerx/{person}/sites.tsv",
+        "data/{cohort}/{person}/mutations.tsv",
+        "data/{cohort}/{person}/sites.tsv",
     params:
-        args=lambda w: config["citup_scan"][w.model]["args"],
-        citup_py=lambda w: config["citup_scan"][w.model]["citup_py"],
-        numSolutions=lambda w: config["citup_scan"][w.model]["num_solutions"],
+        args=lambda w: config["citup_scan"][w.cohort]["args"],
+        citup_py=lambda w: config["citup_scan"][w.cohort]["citup_py"],
+        numSolutions=lambda w: config["citup_scan"][w.cohort]["num_solutions"],
         metastatic_sites=lambda w: SAMPLESHEET.query(
             "person == @w.person"
         ).metastases.iloc[0],
@@ -163,10 +165,10 @@ rule scan_for_target_migrations:
 
 rule plot_for_target_migrations:
     output:
-        directory("results/migration_scan/{model}/mig_{migrations}/{person}/plots"),
+        directory("results/migration_scan/{cohort}/mig_{migrations}/{person}/plots"),
     input:
-        "results/migration_scan/{model}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
-        "data/tracerx/{person}/sites.tsv",
+        "results/migration_scan/{cohort}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
+        "data/{cohort}/{person}/sites.tsv",
     localrule: True
     shell:
         """
@@ -204,15 +206,15 @@ rule read_migration_scan:
 
 rule rerun_with_optimal_migrations:
     output:
-        directory("results/migration_scan/{model}/pareto/{person}/trees"),
+        directory("results/migration_scan/{cohort}/pareto/{person}/trees"),
     input:
-        mutations="data/tracerx/{person}/mutations.tsv",
-        sites="data/tracerx/{person}/sites.tsv",
+        mutations="data/{cohort}/{person}/mutations.tsv",
+        sites="data/{cohort}/{person}/sites.tsv",
     params:
-        args=lambda w: config["citup_optimal"][w.model]["args"],
-        citup_py=lambda w: config["citup_optimal"][w.model]["citup_py"],
-        numSolutions=lambda w: config["citup_optimal"][w.model]["num_solutions"],
-        dagSolutions=lambda w: config["citup_optimal"][w.model]["dag_solutions"],
+        args=lambda w: config["citup_optimal"][w.cohort]["args"],
+        citup_py=lambda w: config["citup_optimal"][w.cohort]["citup_py"],
+        numSolutions=lambda w: config["citup_optimal"][w.cohort]["num_solutions"],
+        dagSolutions=lambda w: config["citup_optimal"][w.cohort]["dag_solutions"],
         metastatic_sites=lambda w: SAMPLESHEET.query(
             "person == @w.person"
         ).metastases.iloc[0],
@@ -241,20 +243,26 @@ rule rerun_with_optimal_migrations:
 rule optimal_rerun_all:
     input:
         expand(
-            "results/migration_scan/conipher/pareto/{person}/trees",
+            "results/migration_scan/{cohort}/pareto/{person}/trees",
+            cohort=COHORT,
             person=SAMPLESHEET.query("~argmin.isna()").person,
         ),
 
 
 rule fixed_trees_all:
     input:
-        expand("results/fixed_trees/conipher/{person}/trees", person=SAMPLESHEET.person),
+        expand(
+            "results/fixed_trees/{cohort}/{person}/trees",
+            cohort=COHORT,
+            person=SAMPLESHEET.person,
+        ),
 
 
 rule penalty_trees_all:
     input:
         expand(
-            "results/penalty_trees/conipher/{person}/trees",
+            "results/penalty_trees/{cohort}/{person}/trees",
+            cohort=COHORT,
             person=SAMPLESHEET.person,
         ),
 
@@ -262,17 +270,19 @@ rule penalty_trees_all:
 rule pareto_fronts_all:
     input:
         expand(
-            "results/migration_scan/conipher/pareto/{person}/pareto.txt",
+            "results/migration_scan/{cohort}/pareto/{person}/pareto.txt",
+            cohort=COHORT,
             person=SAMPLESHEET.person,
         ),
 
 
 rule read_pareto_optima_all:
     output:
-        "results/migration_scan/conipher/pareto/optima.tsv",
+        "results/migration_scan/{cohort}/pareto/optima.tsv",
     input:
         expand(
-            "results/migration_scan/conipher/pareto/{person}/pareto.txt",
+            "results/migration_scan/{cohort}/pareto/{person}/pareto.txt",
+            cohort=COHORT,
             person=SAMPLESHEET.person,
         ),
     params:
