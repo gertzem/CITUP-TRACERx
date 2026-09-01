@@ -146,6 +146,8 @@ rule scan_for_target_migrations:
     resources:
         runtime=24 * 60,
         mem_mb=8 * 1024,
+    log:
+        "results/migration_scan/{cohort}/logs/mig_{migrations}/{person}/citup.log"
     threads: 8
     shell:
         """
@@ -179,7 +181,19 @@ rule plot_for_target_migrations:
             --with-site-transitions \\
             --with_node_info \\
             --all-mike-dag-colorings
+
+        python ../CITUP/plot_commigration_graphs.py "$indir" \\
+            --output-dir {output} \\
+            --sites-file {input[1]}
         """
+
+
+rule plot_for_optimal_migrations:
+    input:
+        expand("results/migration_scan/{cohort}/mig_{migrations:03d}/{person}/plots",
+        zip,
+        cohort=[COHORT] * len(SAMPLESHEET.person),
+        person=SAMPLESHEET.person, migrations=SAMPLESHEET.argmin)
 
 
 rule read_migration_scan:
