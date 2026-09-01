@@ -9,8 +9,8 @@ SAMPLESHEET = SAMPLESHEET.set_index('person', drop=False)
 COHORT = config["cohort"]
 
 def metastatic_sites_option(person):
-    sites = SAMPLESHEET.loc[person, 'metastases']
-    if sites:
+    if not pd.isna(SAMPLESHEET.loc[person, 'metastases']):
+        sites = SAMPLESHEET.loc[person, 'metastases']
         return f'--metastatic-sites {sites}'
     else: 
         return ''
@@ -133,7 +133,7 @@ rule read_optima_with_penalty:
 
 rule scan_for_target_migrations:
     output:
-        "results/migration_scan/{cohort}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
+        directory("results/migration_scan/{cohort}/mig_{migrations}/{person}")
     input:
         "data/{cohort}/{person}/mutations.tsv",
         "data/{cohort}/{person}/sites.tsv",
@@ -151,15 +151,15 @@ rule scan_for_target_migrations:
     threads: 8
     shell:
         """
-        output={output}
-        prefix=${{output%.treeScores.tsv}}
+        mkdir -p {output}
+        prefix={output}/{wildcards.person}.mig_{wildcards.migrations}
         python {params.citup_py} \\
             -f {input[0]} \\
             --sites-file {input[1]} \\
             -o $prefix {params.metastatic_sites} \\
             --numSolutions {params.numSolutions} \\
             --mike-max-migrations {params.max_migrations} \\
-            {params.args} --gurobi-threads {threads}
+            {params.args} --gurobi-threads {threads} > {log} 2>&1
         """
 
 
@@ -201,7 +201,7 @@ rule read_migration_scan:
         "results/migration_scan/{method}/pareto/{person}/pareto.txt",
     input:
         lambda w: expand(
-            "results/migration_scan/{{method}}/mig_{migrations:03d}/{{person}}/{{person}}.mig_{migrations:03d}.treeScores.tsv",
+            "results/migration_scan/{{method}}/mig_{migrations:03d}/{{person}}",
             migrations=[
                 int(m)
                 for m in SAMPLESHEET.query("person==@w.person")
