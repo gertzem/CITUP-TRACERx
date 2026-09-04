@@ -15,7 +15,7 @@ def metastatic_sites_option(person):
     else: 
         return ''
 
-rule optimize_fixed_tree:
+rule optimize_fixed_tree_stage0:
     output:
         directory("results/fixed_trees/{cohort}/{person}/trees"),
     input:
@@ -50,42 +50,7 @@ rule optimize_fixed_tree:
         """
 
 
-rule read_fixed_tree_optima:
-    output:
-        "results/fixed_trees/{cohort}/optima.tsv",
-    input:
-        lambda w: expand(
-            "results/fixed_trees/{w.cohort}/{person}/trees/{person}.tree_0.txt",
-            person=SAMPLESHEET.person,
-        ),
-    shell:
-        """
-        python scripts/read_citup_obj.py {input} > {output}
-        """
-
-
-rule plot_for_fixed_tree:
-    output:
-        directory("results/fixed_trees/{cohort}/{person}/plots"),
-    input:
-        "results/fixed_trees/{cohort}/{person}/trees",
-        "data/{cohort}/{person}/sites.tsv",
-    localrule: True
-    shell:
-        """
-        mkdir -p {output}
-        indir={input[0]}
-
-        python ../CITUP/plot_with_gene_names.py "$indir" \\
-            --output-dir {output} \\
-            --sample-sites {input[1]} \\
-            --with-site-transitions \\
-            --with_node_info \\
-            --all-mike-dag-colorings
-        """
-
-
-rule optimize_with_penalty:
+rule optimize_with_penalty_stage1:
     output:
         directory("results/penalty_trees/{cohort}/{person}/trees"),
     input:
@@ -116,22 +81,7 @@ rule optimize_with_penalty:
         """
 
 
-rule read_optima_with_penalty:
-    output:
-        "results/penalty_trees/{cohort}/optima.tsv",
-    input:
-        lambda w:
-        expand(
-            "results/penalty_trees/{w.cohort}/{person}/trees/{person}.tree_0.txt",
-            person=SAMPLESHEET.query("~free_mets_optima.isna()").person,
-        ),
-    shell:
-        """
-        python scripts/read_citup_obj.py {input} > {output}
-        """
-
-
-rule scan_for_target_migrations:
+rule scan_for_target_migrations_stage2:
     output:
         directory("results/migration_scan/{cohort}/mig_{migrations}/{person}")
     input:
@@ -163,40 +113,7 @@ rule scan_for_target_migrations:
         """
 
 
-rule plot_for_target_migrations:
-    output:
-        directory("results/migration_scan/{cohort}/mig_{migrations}/{person}/plots"),
-    input:
-        "results/migration_scan/{cohort}/mig_{migrations}/{person}/{person}.mig_{migrations}.treeScores.tsv",
-        "data/{cohort}/{person}/sites.tsv",
-    localrule: True
-    shell:
-        """
-        mkdir -p {output}
-        indir=$(dirname {input[0]})
-
-        python ../CITUP/plot_with_gene_names.py "$indir" \\
-            --output-dir {output} \\
-            --sample-sites {input[1]} \\
-            --with-site-transitions \\
-            --with_node_info \\
-            --all-mike-dag-colorings
-
-        python ../CITUP/plot_commigration_graphs.py "$indir" \\
-            --output-dir {output} \\
-            --sites-file {input[1]}
-        """
-
-
-rule plot_for_optimal_migrations:
-    input:
-        expand("results/migration_scan/{cohort}/mig_{migrations:03d}/{person}/plots",
-        zip,
-        cohort=[COHORT] * len(SAMPLESHEET.person),
-        person=SAMPLESHEET.person, migrations=SAMPLESHEET.argmin)
-
-
-rule read_migration_scan:
+rule read_pareto_front_stage2:
     output:
         "results/migration_scan/{method}/pareto/{person}/pareto.txt",
     input:
@@ -216,7 +133,7 @@ rule read_migration_scan:
         """
 
 
-rule rerun_with_optimal_migrations:
+rule rerun_with_optimal_migrations_stage3:
     output:
         directory("results/migration_scan/{cohort}/pareto/{person}/trees"),
     input:
@@ -249,16 +166,8 @@ rule rerun_with_optimal_migrations:
         """
 
 
-rule optimal_rerun_all:
-    input:
-        expand(
-            "results/migration_scan/{cohort}/pareto/{person}/trees",
-            cohort=COHORT,
-            person=SAMPLESHEET.query("~argmin.isna()").person,
-        ),
 
-
-rule fixed_trees_all:
+rule stage0_fixed_trees_all:
     input:
         expand(
             "results/fixed_trees/{cohort}/{person}/trees",
@@ -267,7 +176,7 @@ rule fixed_trees_all:
         ),
 
 
-rule penalty_trees_all:
+rule stage1_penalty_trees_all:
     input:
         expand(
             "results/penalty_trees/{cohort}/{person}/trees",
@@ -276,7 +185,7 @@ rule penalty_trees_all:
         ),
 
 
-rule pareto_fronts_all:
+rule stage2_migration_scan_all:
     input:
         expand(
             "results/migration_scan/{cohort}/pareto/{person}/pareto.txt",
@@ -285,16 +194,10 @@ rule pareto_fronts_all:
         ),
 
 
-rule read_pareto_optima_all:
-    output:
-        "results/migration_scan/{cohort}/pareto/optima.tsv",
+rule stage3_optimal_rerun_all:
     input:
         expand(
-            "results/migration_scan/{cohort}/pareto/{person}/pareto.txt",
+            "results/migration_scan/{cohort}/pareto/{person}/trees",
             cohort=COHORT,
-            person=SAMPLESHEET.person,
+            person=SAMPLESHEET.query("~argmin.isna()").person,
         ),
-    params:
-        samples=lambda w: SAMPLESHEET.to_json(orient="records"),
-    script:
-        "read_pareto_optimal.py"
