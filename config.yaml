@@ -1,6 +1,5 @@
-samplesheet: "samplesheet-tracerx.tsv"
 cohort: "tracerx"
-citup2:
+citup2:  # stage0,1
   tracerx:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
@@ -22,7 +21,29 @@ citup2:
       --mike-node-trigger-mode proxy_all_obs \
       --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
-citup_scan:
+  peace:
+    citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
+    num_solutions: 1
+    dag_solutions: 1
+    args: | 
+      --max-root-out-degree 1 \
+      --min-mutations-per-cluster 0 \
+      --fixClusterMapping \
+      --objective cluster \
+      --clusterWeight equal \
+      --clip-observed-at 1.0 \
+      --co-presence-reward 0 \
+      --mike-presence-threshold 0.025 \
+      --presence-threshold 0.025 \
+      --enum-fit-abs 0.005 \
+      --enum-max-trees 1 \
+      --enum-time-limit 3600 \
+      --mike-gamma 0.01 \
+      --mike-node-trigger-mode proxy_all_obs \
+      --duo-present-reward 0.0051  \
+      --mike-admissibility-mode recursive \
+
+citup_scan: #stage 2
   tracerx:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
@@ -40,11 +61,12 @@ citup_scan:
       --mike-node-trigger-mode proxy_all_obs \
       --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
-  mig8:
-    citup_py: "../CITUP/citup_recomb_w_mike_mig8.py"
+  peace:
+    citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
     dag_solutions: 1
     args: | 
+      --max-root-out-degree 1 \
       --min-mutations-per-cluster 0 \
       --fixClusterMapping \
       --objective cluster \
@@ -56,24 +78,26 @@ citup_scan:
       --mike-node-trigger-mode proxy_all_obs \
       --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
-  mig8a:
-    citup_py: "../CITUP/citup_recomb_w_mike_mig8.py"
-    num_solutions: 1
-    dag_solutions: 1
-    args: | 
-      --min-mutations-per-cluster 0 \
-      --fixClusterMapping \
-      --objective cluster \
-      --clusterWeight equal \
-      --clip-observed-at 1.0 \
-      --co-presence-reward 0 \
-      --mike-presence-threshold 0.025 \
-      --presence-threshold 0.025 \
-      --mike-node-trigger-mode proxy_all_obs \
-      --duo-present-reward 0.0051  \
-      --mike-admissibility-mode recursive \
-citup_optimal:
+
+citup_optimal:  # stage3
   tracerx:
+    citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
+    num_solutions: 10
+    dag_solutions: 10
+    args: | 
+      --max-root-out-degree 1 \
+      --min-mutations-per-cluster 0 \
+      --fixClusterMapping \
+      --objective cluster \
+      --clusterWeight equal \
+      --clip-observed-at 1.0 \
+      --co-presence-reward 0 \
+      --mike-presence-threshold 0.025 \
+      --presence-threshold 0.025 \
+      --mike-node-trigger-mode proxy_all_obs \
+      --duo-present-reward 0.0051  \
+      --mike-admissibility-mode recursive \
+  peace:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 10
     dag_solutions: 10
