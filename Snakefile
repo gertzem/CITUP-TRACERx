@@ -3,7 +3,6 @@ import pandas as pd
 
 configfile: "config.yaml"
 
-
 COHORT = config["cohort"]
 SAMPLESHEET = pd.read_csv("samplesheet-" + COHORT + ".tsv", sep="\t", comment="#")
 SAMPLESHEET = SAMPLESHEET.set_index('person', drop=False)
@@ -14,6 +13,16 @@ def metastatic_sites_option(person):
         return f'--metastatic-sites {sites}'
     else: 
         return ''
+
+def full_citup_scan(samplesheet):
+    samplesheet = samplesheet[~samplesheet.tests.isna()]
+    short_scan = samplesheet[['person']]
+    short_scan['test'] = samplesheet.tests.str.split(',')
+    scan = short_scan.explode('test', ignore_index=True)
+    scan['test'] = scan['test'].astype(int)
+    return scan
+
+FULL_CITUP_SCAN = full_citup_scan(SAMPLESHEET)
 
 rule optimize_fixed_tree_stage0:
     output:
@@ -126,26 +135,6 @@ rule scan_for_target_migrations_stage2:
         """
 
 
-rule read_pareto_front_stage2:
-    output:
-        "results/migration_scan/{method}/pareto/{person}/pareto.txt",
-    input:
-        lambda w: expand(
-            "results/migration_scan/{{method}}/mig_{migrations:03d}/{{person}}",
-            migrations=[
-                int(m)
-                for m in SAMPLESHEET.query("person==@w.person")
-                .tests.iloc[0]
-                .split(",")
-            ],
-        ),
-    localrule: True
-    shell:
-        """
-        python scripts/pareto_front.py {input} > {output}
-        """
-
-
 rule rerun_with_optimal_migrations_stage3:
     output:
         directory("results/migration_scan/{cohort}/pareto/{person}/trees"),
@@ -204,9 +193,11 @@ rule stage1_penalty_trees_all:
 rule stage2_migration_scan_all:
     input:
         expand(
-            "results/migration_scan/{cohort}/pareto/{person}/pareto.txt",
-            cohort=COHORT,
-            person=SAMPLESHEET.person,
+            "results/migration_scan/{cohort}/mig_{migrations:03d}/{person}",
+            zip,
+            cohort=[COHORT] * FULL_CITUP_SCAN.shape[0],
+            person=FULL_CITUP_SCAN.person,
+            migrations=FULL_CITUP_SCAN.test,
         ),
 
 
