@@ -4,9 +4,9 @@ import pandas as pd
 configfile: "config.yaml"
 
 
-SAMPLESHEET = pd.read_csv(config["samplesheet"], sep="\t", comment="#")
-SAMPLESHEET = SAMPLESHEET.set_index('person', drop=False)
 COHORT = config["cohort"]
+SAMPLESHEET = pd.read_csv("samplesheet-" + COHORT + ".tsv", sep="\t", comment="#")
+SAMPLESHEET = SAMPLESHEET.set_index('person', drop=False)
 
 def metastatic_sites_option(person):
     if not pd.isna(SAMPLESHEET.loc[person, 'metastases']):
@@ -27,6 +27,7 @@ rule optimize_fixed_tree_stage0:
         args=lambda w: config["citup2"][w.cohort]["args"],
         citup_py=lambda w: config["citup2"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup2"][w.cohort]["num_solutions"],
+        dagSolutions=lambda w: config["citup2"][w.cohort]["dag_solutions"],
         metastatic_sites = lambda w: metastatic_sites_option(w.person),
     resources:
         runtime=960,
@@ -46,6 +47,7 @@ rule optimize_fixed_tree_stage0:
             --fixed-delta-file {input.delta} {params.metastatic_sites} \\
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
+            --mike-max-refined-solutions {params.dagSolutions} \\
             {params.args} --gurobi-threads {threads}
         """
 
@@ -60,6 +62,7 @@ rule optimize_with_penalty_stage1:
         args=lambda w: config["citup2"][w.cohort]["args"],
         citup_py=lambda w: config["citup2"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup2"][w.cohort]["num_solutions"],
+        dagSolutions=lambda w: config["citup2"][w.cohort]["dag_solutions"],
         metastatic_sites = lambda w: metastatic_sites_option(w.person),
     resources:
         runtime=48 * 60,
@@ -77,6 +80,7 @@ rule optimize_with_penalty_stage1:
             --sites-file {input.sites} {params.metastatic_sites} \\
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
+            --mike-max-refined-solutions {params.dagSolutions} \\
             {params.args} --gurobi-threads {threads}
         """
 
@@ -91,6 +95,7 @@ rule scan_for_target_migrations_stage2:
         args=lambda w: config["citup_scan"][w.cohort]["args"],
         citup_py=lambda w: config["citup_scan"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup_scan"][w.cohort]["num_solutions"],
+        dagSolutions=lambda w: config["citup_scan"][w.cohort]["dag_solutions"],
         metastatic_sites = lambda w: metastatic_sites_option(w.person),
         max_migrations=lambda w: int(w.migrations),
     resources:
@@ -110,6 +115,7 @@ rule scan_for_target_migrations_stage2:
             -o $prefix {params.metastatic_sites} \\
             --numSolutions {params.numSolutions} \\
             --mike-max-migrations {params.max_migrations} \\
+            --mike-max-refined-solutions {params.dagSolutions} \\
             {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
@@ -163,7 +169,7 @@ rule rerun_with_optimal_migrations_stage3:
             -f {input.mutations} \\
             --sites-file {input.sites} {params.metastatic_sites} \\
             -o $outprefix \\
-            --enum-max-trees {params.dagSolutions} \\
+            --mike-max-refined-solutions {params.dagSolutions} \\
             --numSolutions {params.numSolutions} \\
             --mike-max-migrations {params.argmin} \\
             {params.args} --gurobi-threads {threads} >> {log} 2>&1
