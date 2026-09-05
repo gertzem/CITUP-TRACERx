@@ -101,6 +101,7 @@ rule scan_for_target_migrations_stage2:
     threads: 8
     shell:
         """
+        echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
         mkdir -p {output}
         prefix={output}/{wildcards.person}.mig_{wildcards.migrations}
         python {params.citup_py} \\
@@ -109,7 +110,7 @@ rule scan_for_target_migrations_stage2:
             -o $prefix {params.metastatic_sites} \\
             --numSolutions {params.numSolutions} \\
             --mike-max-migrations {params.max_migrations} \\
-            {params.args} --gurobi-threads {threads} > {log} 2>&1
+            {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
 
@@ -150,8 +151,11 @@ rule rerun_with_optimal_migrations_stage3:
         runtime=24 * 60,
         mem_mb=8 * 1024,
     threads: 8
+    log:
+        "results/migration_scan/{cohort}/pareto/logs/{person}/citup.log"
     shell:
         """
+        echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
         outdir={output[0]}
         mkdir -p $outdir
         outprefix="$outdir/{wildcards.person}"
@@ -162,7 +166,7 @@ rule rerun_with_optimal_migrations_stage3:
             --enum-max-trees {params.dagSolutions} \\
             --numSolutions {params.numSolutions} \\
             --mike-max-migrations {params.argmin} \\
-            {params.args} --gurobi-threads {threads}
+            {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
 
