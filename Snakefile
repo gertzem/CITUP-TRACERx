@@ -32,11 +32,14 @@ rule optimize_fixed_tree_stage0:
     resources:
         runtime=960,
         mem_mb=8 * 1024,
+    log:
+        "results/fixed_trees/{cohort}/{person}/logs/citup.log"
     threads: 8
     group:
         "citup2_fixed"
     shell:
         """
+        echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
         outdir={output[0]}
         mkdir -p $outdir
         outprefix="$outdir/{wildcards.person}"
@@ -67,11 +70,14 @@ rule optimize_with_penalty_stage1:
     resources:
         runtime=48 * 60,
         mem_mb=8 * 1024,
+    log:
+        "results/penalty_trees/{cohort}/{person}/logs/citup.log"
     threads: 8
     group:
         "citup2_fixed"
     shell:
         """
+        echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
         outdir={output[0]}
         mkdir -p $outdir
         outprefix="$outdir/{wildcards.person}"
