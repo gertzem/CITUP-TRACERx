@@ -60,7 +60,7 @@ rule optimize_fixed_tree_stage0:
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
             --mike-max-refined-solutions {params.dagSolutions} \\
-            {params.args} --gurobi-threads {threads}
+            {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
 
@@ -96,7 +96,7 @@ rule optimize_with_penalty_stage1:
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
             --mike-max-refined-solutions {params.dagSolutions} \\
-            {params.args} --gurobi-threads {threads}
+            {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
 
