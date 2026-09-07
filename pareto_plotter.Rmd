@@ -1,0 +1,124 @@
+---
+title: "pareto_plotter"
+output: html_document
+date: "2026-09-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(glue)
+library(ggrepel)
+library(ggbeeswarm)
+```
+
+```{r}
+samplesheet <- read_tsv("samplesheet-tracerx.tsv", col_types = cols(
+  person = col_character(),
+  metastases = col_character(),
+  orig_tests = col_number(),
+  tests = col_number(),
+  argmin = col_double(),
+  free_mets_optima = col_double()
+))
+```
+
+```{r}
+fixed_optima <- read_tsv("results/fixed_trees/optima.tsv",
+  col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"),
+  col_types = cols(
+    person = col_character(),
+    migrations = col_double(),
+    commigrations = col_double(),
+    tree_score = col_double(),
+    tree_hash = col_character()
+  )
+)
+conipher_scores <- fixed_optima %>% select("person", "tree_score")
+```
+
+```{r}
+mach2_migrations <- read_tsv("results/summary/mach2_migrations.tsv",
+  col_names = c("person", "migrations", "commigrations", "is_dag"),
+  col_types = cols(
+    person = col_character(),
+    migrations = col_double(),
+    commigrations = col_double(),
+    is_dag = col_logical()
+  )
+)
+metient_migrations <- read_tsv("results/summary/metient_migrations.tsv",
+  col_names = c("person", "migrations", "commigrations"), col_types = cols(
+    person = col_character(),
+    migrations = col_double(),
+    commigrations = col_double()
+  )
+)
+pareto_migrations <- read_tsv("results/migration_scan/tracerx/pareto/optima.tsv",
+  col_names = c("person", "migrations", "tree_score"),
+  col_types = cols(
+    person = col_character(),
+    migrations = col_double(),
+    tree_score = col_double()
+  )
+)
+```
+
+```{r}
+dir.create("results/pareto_plots/tracerx", recursive = TRUE, showWarnings = FALSE)
+```
+
+
+```{r}
+for (i in seq_len(nrow(samplesheet))) {
+  person <- samplesheet$person[i]
+  person_front <- glue("results/migration_scan/tracerx/pareto/{person}/pareto.txt")
+  outfile <- glue("results/pareto_plots/tracerx/{person}_pareto.pdf")
+  pareto <- read_tsv(person_front, col_names = c("migrations", "tree_score"), col_types = cols(
+    migrations = col_double(),
+    tree_score = col_double()
+  ))
+
+  mach2 <- mach2_migrations %>%
+    filter(person == !!person) %>%
+    inner_join(conipher_scores, by = "person")
+  pareto_optimal <- pareto_migrations %>% filter(person == !!person)
+  metient <- metient_migrations %>%
+    filter(person == !!person) %>%
+    inner_join(conipher_scores, by = "person")
+
+  special_points <- bind_rows(
+    pareto_optimal %>% mutate(tool = "Pareto Optimal"),
+    mach2 %>% mutate(tool = "MACH2"),
+    metient %>% mutate(tool = "Metient")
+  )
+  min_x <- min(pareto$migrations)
+  max_x <- max(pareto$migrations)
+  p <- ggplot(pareto, aes(x = migrations, y = tree_score)) +
+    geom_line() +
+    geom_point() +
+    geom_point(
+      data = special_points,
+      aes(
+        x = migrations,
+        y = tree_score,
+        color = tool,
+        shape = tool
+      ),
+      size = 4,
+      position = position_quasirandom(width = 0.2),
+    ) +
+    labs(
+      x = "Migrations",
+      y = "Tree Score (lower is better)",
+      title = person,
+      color = NULL,
+      shape = NULL
+    ) +
+    scale_x_continuous(breaks = seq(min_x, max_x, by = 1)) +
+    theme_minimal()
+
+  ggsave(outfile, plot = p, height = 5, width = 7)
+}
+```
