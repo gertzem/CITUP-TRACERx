@@ -56,11 +56,13 @@ metient_migrations <- read_tsv("results/summary/metient_migrations.tsv",
   )
 )
 pareto_migrations <- read_tsv("results/migration_scan/tracerx/pareto/optima.tsv",
-  col_names = c("person", "migrations", "tree_score"),
+  col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"),
   col_types = cols(
     person = col_character(),
     migrations = col_double(),
-    tree_score = col_double()
+    commigrations = col_double(),
+    tree_score = col_double(),
+    tree_hash = col_character()
   )
 )
 ```
@@ -75,10 +77,16 @@ for (i in seq_len(nrow(samplesheet))) {
   person <- samplesheet$person[i]
   person_front <- glue("results/migration_scan/tracerx/pareto/{person}/pareto.txt")
   outfile <- glue("results/pareto_plots/tracerx/{person}_pareto.pdf")
-  pareto <- read_tsv(person_front, col_names = c("migrations", "tree_score"), col_types = cols(
-    migrations = col_double(),
-    tree_score = col_double()
-  ))
+  pareto <- read_tsv(person_front,
+    col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"), 
+    col_types = cols(
+      person = col_character(),
+      migrations = col_double(),
+      commigrations = col_double(),
+      tree_score = col_double(),
+      tree_hash = col_character()
+    )
+  )
 
   mach2 <- mach2_migrations %>%
     filter(person == !!person) %>%
