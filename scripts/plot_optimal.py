@@ -7,11 +7,23 @@ samplesheet = pd.read_csv(sys.argv[1], sep="\t")
 samplesheet = samplesheet[~samplesheet.argmin.isna()]
 
 optima = sys.argv[2]
-optima_table = pd.read_csv(optima, sep="\t", names=['person', 'optimum', 'score'])
+optima_table = pd.read_csv(
+    optima, sep="\t", names=["person", "optimum", "commigrations", "score", "tree_hash"]
+)
 # Sanity check that the optima in the optimum file are the same as those recorded
 # in the samplesheet
-if optima_table.merge(samplesheet, on='person').query('argmin != optimum').shape[0] > 0:
-    print('Optima do not match optima in the samplesheet')
+if (
+    optima_table.merge(samplesheet, on="person")
+    .query("argmin != optimum")
+    .shape[0]
+    > 0
+):
+    print("Optima do not match optima in the samplesheet")
+    print(
+        optima_table.merge(samplesheet, on="person").query(
+            "argmin != optimum"
+        )[["person", "argmin", "optimum"]]
+    )
     sys.exit(1)
 
 cohort_dir = Path(optima).parent.parent
