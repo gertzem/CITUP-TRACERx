@@ -2,7 +2,7 @@ import sys
 import re
 import hashlib
 
-cruk = re.compile(r"CRUKP?\d+(?:Tumor\d)?")
+cruk = re.compile(r"CRUKP?\d+(?:_Tumour\d)?")
 
 for filename in sys.argv[1:]:
     m = cruk.search(filename)

@@ -3,7 +3,7 @@ import re
 import gzip
 import pickle
 
-cruk = re.compile(r"CRUK\d+")
+cruk = re.compile(r"CRUKP?\d+(?:_Tumour\d)?")
 
 for filename in sys.argv[1:]:
     m = cruk.search(filename)
