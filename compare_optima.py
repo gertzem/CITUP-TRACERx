@@ -8,155 +8,164 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.19.3
 #   kernelspec:
-#     display_name: Python 3 (ipykernel)
+#     display_name: Python (base)
 #     language: python
-#     name: python3
+#     name: base
 # ---
 
 import pandas as pd
 
-us = pd.read_csv('results/citup_scan_mets/conipher/pareto/optima.tsv',
-                 names=['person', 'migrations', 'comigrations', 'quad', 'tree'], sep="\t")
+us = pd.read_csv(
+    "results/migration_scan/tracerx/pareto/optima.tsv",
+    names=["person", "migrations", "comigrations", "quad", "tree"],
+    sep="\t",
+)
 
-them = pd.read_csv('results/citup2_mets/conipher/optima.tsv',
-                 names=['person', 'migrations', 'comigrations', 'quad', 'tree'], sep="\t")
+them = pd.read_csv(
+    "results/fixed_trees/optima.tsv",
+    names=["person", "migrations", "comigrations", "quad", "tree"],
+    sep="\t",
+)
 
-both = us.merge(them, on='person', suffixes=("_us", "_them"))
+both = us.merge(them, on="person", suffixes=("_us", "_them"))
 
-mach2 = pd.read_csv('results/summary/mach2_migrations.tsv', sep="\t", names=["person", "migrations_mach2", "comigrations_mach2", "is_dag"])
+mach2 = pd.read_csv(
+    "results/summary/mach2_migrations.tsv",
+    sep="\t",
+    names=["person", "migrations_mach2", "comigrations_mach2", "is_dag"],
+)
 
-cmp = both.merge(mach2, on='person').set_index('person', drop=False)
+cmp = both.merge(mach2, on="person").set_index("person", drop=False)
 
 
 def migrations_cmp(a, b):
     if a < b:
-        return 'migrations_better'
+        return "migrations_better"
     elif a > b:
-        return 'migrations_worse'
+        return "migrations_worse"
     else:
-        return 'migrations_same'
+        return "migrations_same"
 
 
 def mach2_comigrations_cmp(a, b):
     if a < b:
-        return '0mach2_worse_cm'
+        return "0mach2_worse_cm"
     elif a > b:
-        return '2mach2_better_cm'
+        return "2mach2_better_cm"
     else:
-        return '1mach2_same_cm'
+        return "1mach2_same_cm"
 
 
 def tree_score_cmp(a, b):
     if a < b:
-        return 'score_better'
+        return "score_better"
     elif a > b:
-        return 'score_worse'
+        return "score_worse"
     else:
-        return 'score_same'
+        return "score_same"
 
 
 def tree_score_relcmp(a, b):
     if a < 0.95 * b:
-        return 'score_better'
+        return "score_better"
     elif a > 1.05 * b:
-        return 'score_worse'
+        return "score_worse"
     else:
-        return 'score_same'
+        return "score_same"
 
 
 def mach2_cmp(a, b):
     if a < b:
-        return '0mach2_worse'
+        return "0mach2_worse"
     elif a > b:
-        return '2mach2_better'
+        return "2mach2_better"
     else:
-        return '1mach2_same'
+        return "1mach2_same"
 
 
-cmp['migrations_cmp'] = cmp.apply(lambda r: migrations_cmp(r['migrations_us'], r['migrations_them']), axis=1)
+cmp["migrations_cmp"] = cmp.apply(
+    lambda r: migrations_cmp(r["migrations_us"], r["migrations_them"]), axis=1
+)
 
-cmp['mach2_cmp'] = cmp.apply(lambda r: mach2_cmp(r['migrations_us'], r['migrations_mach2']), axis=1)
+cmp["fixed_mig_cmp"] = cmp.apply(
+    lambda r: migrations_cmp(r["migrations_them"], r["migrations_mach2"]),
+    axis=1,
+)
 
-cmp['mach2_comigrations_cmp'] = cmp.apply(lambda r: mach2_comigrations_cmp(r['comigrations_us'], r['comigrations_mach2']), axis=1)
+cmp["mach2_cmp"] = cmp.apply(
+    lambda r: mach2_cmp(r["migrations_us"], r["migrations_mach2"]), axis=1
+)
 
-cmp['tree_score_cmp'] = cmp.apply(lambda r: tree_score_cmp(r['quad_us'], r['quad_them']), axis=1)
+cmp["mach2_comigrations_cmp"] = cmp.apply(
+    lambda r: mach2_comigrations_cmp(
+        r["comigrations_us"], r["comigrations_mach2"]
+    ),
+    axis=1,
+)
 
-cmp['tree_score_relcmp'] = cmp.apply(lambda r: tree_score_relcmp(r['quad_us'], r['quad_them']), axis=1)
+cmp["tree_score_cmp"] = cmp.apply(
+    lambda r: tree_score_cmp(r["quad_us"], r["quad_them"]), axis=1
+)
 
-# Absolute score comparisons
+cmp["tree_score_relcmp"] = cmp.apply(
+    lambda r: tree_score_relcmp(r["quad_us"], r["quad_them"]), axis=1
+)
 
-pd.crosstab(cmp['migrations_cmp'], cmp['tree_score_cmp'])
+# ## Absolute score comparisons
 
-pd.crosstab(cmp['mach2_cmp'], cmp['tree_score_cmp'])
+print(pd.crosstab(cmp["migrations_cmp"], cmp["tree_score_cmp"]).to_markdown())
 
-pd.crosstab(cmp['migrations_cmp'], cmp['tree_score_relcmp'])
+print(pd.crosstab(cmp["mach2_cmp"], cmp["tree_score_cmp"]).to_markdown())
 
-pd.crosstab(cmp['mach2_cmp'], cmp['tree_score_relcmp'])
+# ## Relative Score comparisions
 
-# Relative score commparisons
+print(
+    pd.crosstab(cmp["migrations_cmp"], cmp["tree_score_relcmp"]).to_markdown()
+)
 
-cmp.query('tree_score_relcmp == "score_worse"')
+print(pd.crosstab(cmp["mach2_cmp"], cmp["tree_score_relcmp"]).to_markdown())
 
-cmp.query('migrations_cmp == "migrations_worse" & mach2_cmp == "2mach2_better"')
+# ## There are no cases on the fixed CONIPHER tree that mach2 gets fewer migrations
 
-cmp.query('migrations_cmp == "migrations_better"')
+cmp.query('fixed_mig_cmp == "mach2_better"')
 
-mach2
+print(
+    cmp.query('tree_score_relcmp == "score_worse"')[
+        [
+            "person",
+            "migrations_us",
+            "quad_us",
+            "migrations_them",
+            "quad_them",
+            "migrations_mach2",
+        ]
+    ].to_markdown(index=False)
+)
 
-both
+cmp.query("tree_us == tree_them").shape[0]
 
-cmp.query('tree_us == tree_them').shape[0]
+cmp.query("migrations_us == migrations_them & quad_us == quad_them").shape[0]
 
-cmp.query('tree_us == tree_them & quad_us == quad_them').shape[0]
+cmp["same_tree"] = cmp["tree_us"] == cmp["tree_them"]
 
-cmp = cmp.set_index('person', drop=False)
+print(
+    cmp.query('mach2_cmp == "0mach2_worse" & tree_score_cmp == "score_same"')[
+        ["person", "migrations_us", "migrations_mach2", "same_tree"]
+    ].to_markdown(index=False)
+)
 
-cmp.loc[['CRUK0530', 'CRUK0572']]
-
-mach2_worse = cmp.query('mach2_cmp == "0mach2_worse" & quad_us == quad_them').copy()
-
-mach2_worse['same_tree'] = mach2_worse['tree_us'] == mach2_worse['tree_them']
-
-mach2_worse[['person', 'migrations_us', 'migrations_mach2', 'same_tree']]
-
-# mach2_rel_worse = cmp.query('mach2_cmp == "0mach2_worse" & tree_score_relcmp = "').copy()
-
-mach2_relworse = cmp.query('mach2_cmp == "0mach2_worse" & tree_score_relcmp == "score_same"').copy()
-
-mach2_relworse['same_tree'] = mach2_relworse['tree_us'] == mach2_relworse['tree_them']
-
-mach2_relworse[['person', 'migrations_us', 'migrations_mach2', 'same_tree']]
-
-mach2_same = cmp.query('mach2_cmp == "1mach2_same"')
-
-pd.crosstab(mach2_same['mach2_comigrations_cmp'],mach2_same['tree_score_cmp'])
-
-mach2_same.query('mach2_comigrations_cmp == "2mach2_better_cm" & tree_score_cmp == "score_same"')[['person', 'migrations_us', 'comigrations_us', 'quad_us', 'migrations_mach2', 'comigrations_mach2', 'quad_them', 'tree_us', 'tree_them']]
-
-us = us.set_index('person', drop=False)
-
-both = both.set_index('person', drop=False)
-
-both.loc[['CRUK0311', 'CRUK0620']]
-
-us.index
-
-cmp
-
-fixed_cmp = cmp.copy()
-
-fixed_cmp['mach2_comigrations_cmp'] = cmp.apply(lambda r: mach2_comigrations_cmp(r['comigrations_them'], r['comigrations_mach2']), axis=1)
-
-fixed_cmp['mach2_cmp'] = cmp.apply(lambda r: mach2_cmp(r['migrations_them'], r['migrations_mach2']), axis=1)
-
-pd.crosstab(fixed_cmp['mach2_cmp'], fixed_cmp['mach2_comigrations_cmp'])
-
-fixed_cmp['mach2_cmp'].value_counts()
+print(
+    cmp.query(
+        'mach2_comigrations_cmp == "2mach2_better_cm" & mach2_cmp == "1mach2_same" &tree_score_cmp == "score_same"'
+    )[
+        [
+            "person",
+            "migrations_us",
+            "comigrations_us",
+            "comigrations_mach2",
+            "same_tree",
+        ]
+    ].to_markdown(index=False)
+)
 
 mach2.is_dag.value_counts()
-
-cmp
-
-len(cmp['mach2_cmp'])
-
-
