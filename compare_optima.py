@@ -15,8 +15,10 @@
 
 import pandas as pd
 
+pareto_optima_file = "results/migration_scan/tracerx/pareto/sqrtabs-optima.tsv"
+
 us = pd.read_csv(
-    "results/migration_scan/tracerx/pareto/optima.tsv",
+    pareto_optima_file,
     names=["person", "migrations", "comigrations", "quad", "tree"],
     sep="\t",
 )
@@ -130,7 +132,33 @@ print(pd.crosstab(cmp["mach2_cmp"], cmp["tree_score_relcmp"]).to_markdown())
 cmp.query('fixed_mig_cmp == "mach2_better"')
 
 print(
-    cmp.query('tree_score_relcmp == "score_worse"')[
+    cmp.query('tree_score_cmp == "score_worse"')[
+        [
+            "person",
+            "migrations_us",
+            "quad_us",
+            "migrations_them",
+            "quad_them",
+            "migrations_mach2",
+        ]
+    ].to_markdown(index=False)
+)
+
+print(
+    cmp.query('mach2_cmp == "2mach2_better"')[
+        [
+            "person",
+            "migrations_us",
+            "quad_us",
+            "migrations_them",
+            "quad_them",
+            "migrations_mach2",
+        ]
+    ].to_markdown(index=False)
+)
+
+print(
+    cmp.query('tree_score_cmp == "score_worse"')[
         [
             "person",
             "migrations_us",
