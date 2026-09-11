@@ -16,10 +16,9 @@ def metastatic_sites_option(person):
 
 def full_citup_scan(samplesheet):
     samplesheet = samplesheet[~samplesheet.tests.isna()]
-    short_scan = samplesheet[['person']]
-    short_scan['test'] = samplesheet.tests.str.split(',')
+    short_scan = samplesheet[['person']].copy()
+    short_scan['test'] = samplesheet.tests.apply(lambda x : [int(i) for i in x.split(',')])
     scan = short_scan.explode('test', ignore_index=True)
-    scan['test'] = scan['test'].astype(int)
     return scan
 
 FULL_CITUP_SCAN = full_citup_scan(SAMPLESHEET)
@@ -93,6 +92,84 @@ rule optimize_with_penalty_stage1:
         python {params.citup_py} \\
             -f {input.mutations} \\
             --sites-file {input.sites} {params.metastatic_sites} \\
+            -o $outprefix \\
+            --numSolutions {params.numSolutions} \\
+            --mike-max-refined-solutions {params.dagSolutions} \\
+            {params.args} --gurobi-threads {threads} >> {log} 2>&1
+        """
+
+
+rule optimize_without_migrations_stage1:
+    output:
+        directory("results/optimal_trees/{cohort}/{person}/trees"),
+    input:
+        mutations="data/{cohort}/{person}/mutations.tsv",
+        sites="data/{cohort}/{person}/sites.tsv",
+    params:
+        args=lambda w: config["citup2_no_migrations"][w.cohort]["args"],
+        citup_py=lambda w: config["citup2_no_migrations"][w.cohort]["citup_py"],
+        numSolutions=lambda w: config["citup2_no_migrations"][w.cohort]["num_solutions"],
+        dagSolutions=lambda w: config["citup2_no_migrations"][w.cohort]["dag_solutions"],
+        metastatic_sites = lambda w: metastatic_sites_option(w.person),
+    resources:
+        runtime=24 * 60,
+        mem_mb=8 * 1024,
+    log:
+        "results/optimal_trees/{cohort}/{person}/logs/citup.log"
+    threads: 8
+    group:
+        "citup2_no_migations"
+    shell:
+        """
+        echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
+        outdir={output[0]}
+        mkdir -p $outdir
+        outprefix="$outdir/{wildcards.person}"
+        python {params.citup_py} \\
+            -f {input.mutations} \\
+            --sites-file {input.sites} {params.metastatic_sites} \\
+            -o $outprefix \\
+            --numSolutions {params.numSolutions} \\
+            --mike-max-refined-solutions {params.dagSolutions} \\
+            {params.args} --gurobi-threads {threads} >> {log} 2>&1
+        """
+
+rule migrations_for_citup_optima_stage1:
+    output:
+        directory("results/migration_trees/{cohort}/{person}/trees"),
+    input:
+        mutations="data/{cohort}/{person}/mutations.tsv",
+        sites="data/{cohort}/{person}/sites.tsv",
+        optima="results/optimal_trees/{cohort}/{person}/trees"
+    params:
+        args=lambda w: config["citup2"][w.cohort]["args"],
+        citup_py=lambda w: config["citup2"][w.cohort]["citup_py"],
+        numSolutions=lambda w: config["citup2"][w.cohort]["num_solutions"],
+        dagSolutions=lambda w: config["citup2"][w.cohort]["dag_solutions"],
+        metastatic_sites = lambda w: metastatic_sites_option(w.person),
+        tree_scores = lambda w: expand("results/optimal_trees/{cohort}/{person}/trees/{person}.tree_0.txt",
+                                        cohort=w.cohort, person=w.person),
+    resources:
+        runtime=960,
+        mem_mb=8 * 1024,
+    log:
+        "results/migration_trees/{cohort}/{person}/logs/citup.log"
+    threads: 8
+    group:
+        "citup2_fixed"
+    shell:
+        """
+        echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
+        outdir={output[0]}
+        mkdir -p $outdir
+        outprefix="$outdir/{wildcards.person}"
+
+        python scripts/extract_fixed_tree.py {params.tree_scores} $outdir >> {log} 2>&1
+        python {params.citup_py} \\
+            -f {input.mutations} \\
+            --sites-file {input.sites} \\
+            --fixed-B-file $outdir/fixed_B.tsv \\
+            --fixed-delta-file $outdir/fixed_delta.tsv {params.metastatic_sites} \\
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
             --mike-max-refined-solutions {params.dagSolutions} \\
@@ -185,6 +262,24 @@ rule stage1_penalty_trees_all:
     input:
         expand(
             "results/penalty_trees/{cohort}/{person}/trees",
+            cohort=COHORT,
+            person=SAMPLESHEET.person,
+        ),
+
+
+rule stage1_optimal_trees_all:
+    input:
+        expand(
+            "results/optimal_trees/{cohort}/{person}/trees",
+            cohort=COHORT,
+            person=SAMPLESHEET.person,
+        ),
+
+
+rule stage1_migration_trees_all:
+    input:
+        expand(
+            "results/migration_trees/{cohort}/{person}/trees",
             cohort=COHORT,
             person=SAMPLESHEET.person,
         ),
