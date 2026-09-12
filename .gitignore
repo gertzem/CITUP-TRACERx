@@ -11,6 +11,7 @@ gurobi.log
 *.o
 *.e
 .ipynb_checkpoints/
+/*.ipynb
 a
 aa
 aaa
