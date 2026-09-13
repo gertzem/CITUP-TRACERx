@@ -104,13 +104,11 @@ rule optimize_without_migrations_stage1:
         directory("results/optimal_trees/{cohort}/{person}/trees"),
     input:
         mutations="data/{cohort}/{person}/mutations.tsv",
-        sites="data/{cohort}/{person}/sites.tsv",
     params:
         args=lambda w: config["citup2_no_migrations"][w.cohort]["args"],
         citup_py=lambda w: config["citup2_no_migrations"][w.cohort]["citup_py"],
         numSolutions=lambda w: config["citup2_no_migrations"][w.cohort]["num_solutions"],
         dagSolutions=lambda w: config["citup2_no_migrations"][w.cohort]["dag_solutions"],
-        metastatic_sites = lambda w: metastatic_sites_option(w.person),
     resources:
         runtime=24 * 60,
         mem_mb=8 * 1024,
@@ -127,10 +125,8 @@ rule optimize_without_migrations_stage1:
         outprefix="$outdir/{wildcards.person}"
         python {params.citup_py} \\
             -f {input.mutations} \\
-            --sites-file {input.sites} {params.metastatic_sites} \\
             -o $outprefix \\
             --numSolutions {params.numSolutions} \\
-            --mike-max-refined-solutions {params.dagSolutions} \\
             {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
