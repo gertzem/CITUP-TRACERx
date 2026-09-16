@@ -23,6 +23,10 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "baseline_optima"
+)
+
+parser.add_argument(
     "files",
     nargs="*",
     help="Input files",
@@ -33,6 +37,8 @@ args = parser.parse_args()
 epsilon = args.epsilon
 tau = args.tau
 
+baseline_optima = pd.read_csv(args.baseline_optima, sep="\t", names=["person", "migrations", "commigrations", "tree_score", "tree_hash"])
+baseline_optima = baseline_optima.set_index('person', drop=False)
 
 optima = []
 for filename in args.files:
@@ -41,11 +47,20 @@ for filename in args.files:
         print("Cannot read", filename)
         sys.exit(1)
     person = m.group()
-    scores = pd.read_csv(filename, sep="\t", names=["person", "migration", "commigrations", "tree_score", "tree_hash"])
+    baseline = baseline_optima.loc[person]
+    scores = pd.read_csv(filename, sep="\t", names=["person", "migrations", "commigrations", "tree_score", "tree_hash"])
+    scores = scores.set_index("migrations", drop=False)
+    scores = scores[scores.migrations <= baseline.migrations]
+    if baseline.migrations in scores.index:
+        if baseline.tree_score < scores.loc[baseline.migrations, 'tree_score']:
+        scores.loc[baseline.migrations, :] = baseline
+    else:
+        scores.loc[baseline.migrations, :] = baseline
+
     best_tree_score = scores.tree_score.min()
     upper_limit = tau * (best_tree_score + epsilon)
     good_scores = scores.query("tree_score <= @upper_limit")
-    i = good_scores.migration.argmin()
+    i = good_scores.migrations.argmin()
 
     optima.append(good_scores.iloc[i])
 
