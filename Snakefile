@@ -152,7 +152,7 @@ rule migrations_for_citup_optima_stage1:
         "results/migration_trees/{cohort}/{person}/logs/citup.log"
     threads: 8
     group:
-        "citup2_fixed"
+        "citup2_no_migations"
     shell:
         """
         echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
