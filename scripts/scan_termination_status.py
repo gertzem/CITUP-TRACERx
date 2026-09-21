@@ -36,7 +36,7 @@ result = subprocess.run(
         "--noheader",
         "--parsable2",
         "--allocations",
-        "--format=JobIDRaw,State",
+        "--format=JobIDRaw,State,Elapsed",
     ],
     capture_output=True,
     text=True,
@@ -47,13 +47,14 @@ result = subprocess.run(
 records = []
 for line in result.stdout.splitlines():
     if line.strip():
-        jobid, state = line.split("|", 1)
-        records.append((jobid, state))
+        jobid, state, runtime = line.split("|", 2)
+        records.append((jobid, state, runtime))
 
-term_status = pd.DataFrame(records, columns=["jobid", "status"])
+term_status = pd.DataFrame(records, columns=["jobid",
+    "status","runtime"])
 status = status.merge(term_status, how="left", on="jobid")
 # Must have failed to be declared infeasible
 status.loc[status.infeasible & (status.status == 'FAILED'), 'status'] = "Infeasible"
-status[["person", "migrations", "jobid", "status"]].to_csv(
+status[["person", "migrations", "jobid", "status","runtime"]].to_csv(
     sys.stdout, sep="\t", index=False
 )
