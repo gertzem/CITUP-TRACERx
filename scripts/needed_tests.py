@@ -9,6 +9,4 @@ print('tests')
 for person in samplesheet.person:
     sites = pd.read_csv(f'data/tracerx/{person}/sites.tsv', sep="\t")
     nsites = sites.site.nunique()
-    if person == 'CRUK0035':
-        breakpoint()
     print(','.join([str(i) for i in range(nsites - 1, sequential.loc[person, 'migrations']+1)]))
