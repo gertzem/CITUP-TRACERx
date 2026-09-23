@@ -21,7 +21,15 @@ def full_citup_scan(samplesheet):
     scan = short_scan.explode('test', ignore_index=True)
     return scan
 
+def display_citup_scan(samplesheet):
+    samplesheet = samplesheet[~samplesheet.tests.isna()]
+    short_scan = samplesheet[['person']].copy()
+    short_scan['display_tests'] = samplesheet.display_tests.apply(lambda x : [int(i) for i in x.split(',')])
+    scan = short_scan.explode('display_tests', ignore_index=True)
+    return scan
+
 FULL_CITUP_SCAN = full_citup_scan(SAMPLESHEET)
+DISPLAY_CITUP_SCAN = display_citup_scan(SAMPLESHEET)
 
 rule optimize_fixed_tree_stage0:
     output:
@@ -289,6 +297,17 @@ rule stage2_migration_scan_all:
             cohort=[COHORT] * FULL_CITUP_SCAN.shape[0],
             person=FULL_CITUP_SCAN.person,
             migrations=FULL_CITUP_SCAN.test,
+        ),
+
+
+rule stage2_migration_scan_display_all:
+    input:
+        expand(
+            "results/migration_scan/{cohort}/mig_{migrations:03d}/{person}",
+            zip,
+            cohort=[COHORT] * DISPLAY_CITUP_SCAN.shape[0],
+            person=DISPLAY_CITUP_SCAN.person,
+            migrations=DISPLAY_CITUP_SCAN.display_tests,
         ),
 
 
