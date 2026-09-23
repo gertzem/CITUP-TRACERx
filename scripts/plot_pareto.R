@@ -1,31 +1,12 @@
----
-title: "pareto_plotter"
-output: html_document
-date: "2026-09-06"
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggplot2)
 library(glue)
 library(ggrepel)
 library(ggbeeswarm)
-```
 
-```{r}
-samplesheet <- read_tsv("samplesheet-tracerx.tsv", col_types = cols(
-  person = col_character(),
-  metastases = col_character(),
-  orig_tests = col_number(),
-  tests = col_number(),
-  argmin = col_double(),
-  free_mets_optima = col_double()
-))
-```
+samplesheet <- read_tsv("samplesheet-tracerx.tsv")
 
-```{r}
-fixed_optima <- read_tsv("results/fixed_trees/optima.tsv",
+fixed_optima <- read_tsv("results/fixed_trees/tracerx/optima.tsv",
   col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"),
   col_types = cols(
     person = col_character(),
@@ -36,9 +17,7 @@ fixed_optima <- read_tsv("results/fixed_trees/optima.tsv",
   )
 )
 conipher_scores <- fixed_optima %>% select("person", "tree_score")
-```
 
-```{r}
 mach2_migrations <- read_tsv("results/summary/mach2_migrations.tsv",
   col_names = c("person", "migrations", "commigrations", "is_dag"),
   col_types = cols(
@@ -65,14 +44,9 @@ pareto_migrations <- read_tsv("results/migration_scan/tracerx/pareto/optima.tsv"
     tree_hash = col_character()
   )
 )
-```
 
-```{r}
 dir.create("results/pareto_plots/tracerx", recursive = TRUE, showWarnings = FALSE)
-```
 
-
-```{r}
 for (i in seq_len(nrow(samplesheet))) {
   person <- samplesheet$person[i]
   person_front <- glue("results/migration_scan/tracerx/pareto/{person}/pareto.txt")
@@ -129,4 +103,3 @@ for (i in seq_len(nrow(samplesheet))) {
 
   ggsave(outfile, plot = p, height = 5, width = 7)
 }
-```
