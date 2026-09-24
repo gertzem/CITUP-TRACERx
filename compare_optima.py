@@ -14,8 +14,9 @@
 # ---
 
 import pandas as pd
+import numpy as np
 
-pareto_optima_file = "results/migration_scan/tracerx/pareto/sqrtabs-optima.tsv"
+pareto_optima_file = "results/migration_scan/tracerx/pareto/optima.tsv"
 
 us = pd.read_csv(
     pareto_optima_file,
@@ -24,7 +25,7 @@ us = pd.read_csv(
 )
 
 them = pd.read_csv(
-    "results/fixed_trees/optima.tsv",
+    "results/fixed_trees/tracerx/optima.tsv",
     names=["person", "migrations", "comigrations", "quad", "tree"],
     sep="\t",
 )
@@ -37,7 +38,13 @@ mach2 = pd.read_csv(
     names=["person", "migrations_mach2", "comigrations_mach2", "is_dag"],
 )
 
-cmp = both.merge(mach2, on="person").set_index("person", drop=False)
+metient = pd.read_csv(
+    "results/summary/metient_migrations.tsv",
+    sep="\t",
+    names=["person", "migrations_metient", "comigrations_metient"],
+)
+
+cmp = both.merge(mach2, on="person", how="left").merge(metient, on="person", how="left").set_index("person", drop=False)
 
 
 def migrations_cmp(a, b):
@@ -85,6 +92,15 @@ def mach2_cmp(a, b):
         return "1mach2_same"
 
 
+def metient_cmp(a, b):
+    if a < b:
+        return "0metient_worse"
+    elif a > b:
+        return "2metient_better"
+    else:
+        return "1metient_same"
+
+
 cmp["migrations_cmp"] = cmp.apply(
     lambda r: migrations_cmp(r["migrations_us"], r["migrations_them"]), axis=1
 )
@@ -94,8 +110,21 @@ cmp["fixed_mig_cmp"] = cmp.apply(
     axis=1,
 )
 
+cmp["fixed_metient_cmp"] = cmp.apply(
+    lambda r: migrations_cmp(r["migrations_them"], r["migrations_metient"]),
+    axis=1,
+)
+
 cmp["mach2_cmp"] = cmp.apply(
     lambda r: mach2_cmp(r["migrations_us"], r["migrations_mach2"]), axis=1
+)
+
+cmp["metient_cmp"] = cmp.apply(
+    lambda r: metient_cmp(r["migrations_us"], r["migrations_metient"]), axis=1
+)
+
+cmp["mach2_metient_cmp"] = cmp.apply(
+    lambda r: metient_cmp(r["migrations_mach2"], r["migrations_metient"]), axis=1
 )
 
 cmp["mach2_comigrations_cmp"] = cmp.apply(
@@ -119,6 +148,8 @@ print(pd.crosstab(cmp["migrations_cmp"], cmp["tree_score_cmp"]).to_markdown())
 
 print(pd.crosstab(cmp["mach2_cmp"], cmp["tree_score_cmp"]).to_markdown())
 
+print(pd.crosstab(cmp["metient_cmp"], cmp["tree_score_cmp"]).to_markdown())
+
 # ## Relative Score comparisions
 
 print(
@@ -127,35 +158,15 @@ print(
 
 print(pd.crosstab(cmp["mach2_cmp"], cmp["tree_score_relcmp"]).to_markdown())
 
-# ## There are no cases on the fixed CONIPHER tree that mach2 gets fewer migrations
+print(pd.crosstab(cmp["metient_cmp"], cmp["tree_score_relcmp"]).to_markdown())
 
-cmp.query('fixed_mig_cmp == "mach2_better"')
+# ## There are no cases on the **fixed** CONIPHER tree that MACH2 or Metient gets fewer migrations than CITUP
 
-print(
-    cmp.query('tree_score_cmp == "score_worse"')[
-        [
-            "person",
-            "migrations_us",
-            "quad_us",
-            "migrations_them",
-            "quad_them",
-            "migrations_mach2",
-        ]
-    ].to_markdown(index=False)
-)
+cmp.fixed_mig_cmp.value_counts()
 
-print(
-    cmp.query('mach2_cmp == "2mach2_better"')[
-        [
-            "person",
-            "migrations_us",
-            "quad_us",
-            "migrations_them",
-            "quad_them",
-            "migrations_mach2",
-        ]
-    ].to_markdown(index=False)
-)
+cmp.fixed_metient_cmp.value_counts()
+
+# ## Cases where we have worse tree score
 
 print(
     cmp.query('tree_score_cmp == "score_worse"')[
@@ -170,17 +181,33 @@ print(
     ].to_markdown(index=False)
 )
 
-cmp.query("tree_us == tree_them").shape[0]
+# ## There are no cases in the joint pipeline where MACH2 or Metient gets fewer migrations
 
-cmp.query("migrations_us == migrations_them & quad_us == quad_them").shape[0]
+cmp.mach2_cmp.value_counts()
 
-cmp["same_tree"] = cmp["tree_us"] == cmp["tree_them"]
+cmp.metient_cmp.value_counts()
+
+# ## Metient is usually worse than MACH2, but sometimes gets fewer migrations
+
+cmp.mach2_metient_cmp.value_counts()
 
 print(
     cmp.query('mach2_cmp == "0mach2_worse" & tree_score_cmp == "score_same"')[
-        ["person", "migrations_us", "migrations_mach2", "same_tree"]
+        ["person", "migrations_us", "migrations_mach2"]
     ].to_markdown(index=False)
 )
+
+# ## Mach2 often does not produce DAGS
+
+mach2.is_dag.value_counts()
+
+# ## Sometimes we don't produce DAGs
+
+print(cmp.query('comigrations_us.isna()')[['person', 'migrations_us', 'quad_us', 'migrations_mach2', 'is_dag']].to_markdown(index=False))
+
+# ## Our commigrations may be worse
+
+# +
 
 print(
     cmp.query(
@@ -191,9 +218,61 @@ print(
             "migrations_us",
             "comigrations_us",
             "comigrations_mach2",
-            "same_tree",
+            "is_dag"
+        ]
+    ].to_markdown(index=False)
+)
+# -
+
+# ## On the CONIPHER tree, how often do we produce DAGs
+
+conipher_optima_dag = np.where(~cmp.comigrations_them.isna(), 'CITUP_DAG', 'CITUP_notDAG')
+
+mach2_optima_dag = np.where(cmp.is_dag, 'MACH2_DAG', 'MACH2_notDAG')
+
+print(pd.crosstab(conipher_optima_dag, mach2_optima_dag).to_markdown())
+
+print(
+    cmp.query(
+        'comigrations_mach2 < comigrations_them & migrations_mach2 == migrations_them'
+    )[
+        [
+            "person",
+            "migrations_us",
+            "comigrations_us",
+            "comigrations_mach2",
+            "is_dag"
         ]
     ].to_markdown(index=False)
 )
 
-mach2.is_dag.value_counts()
+print(
+    cmp.query(
+        'comigrations_mach2 < comigrations_them & migrations_mach2 == migrations_them'
+    )[
+        [
+            "person",
+            "migrations_them",
+            "comigrations_them",
+            "migrations_mach2",
+            "comigrations_mach2",
+            "is_dag"
+        ]
+    ].to_markdown(index=False)
+)
+
+print(
+    cmp.query(
+        'comigrations_them.isna()'
+    )[
+        [
+            "person",
+            "migrations_them",
+            "migrations_mach2",
+            "comigrations_mach2",
+            "is_dag"
+        ]
+    ].to_markdown(index=False)
+)
+
+
