@@ -4,7 +4,7 @@ import sys
 
 import pandas as pd
 
-cruk = re.compile(r"CRUKP?\d+(?:_Tumour\d)?")
+cruk = re.compile(r"P?\d+(?:_Tumour\d)?")
 
 parser = argparse.ArgumentParser()
 

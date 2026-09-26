@@ -1,7 +1,7 @@
 import sys
 import re
 
-cruk = re.compile(r"CRUKP?\d+(?:_Tumour\d)?")
+cruk = re.compile(r"P?\d+(?:_Tumour\d)?")
 refined_tree = re.compile(r"refined.tree")
 
 def is_dag(children):

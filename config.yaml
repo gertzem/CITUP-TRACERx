@@ -1,12 +1,12 @@
-cohort: "tracerx"
+cohort: "meso"
 citup2:  # stage0,1
-  tracerx:
+  meso:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
     dag_solutions: 1
     args: | 
       --max-root-out-degree 1 \
-      --min-mutations-per-cluster 0 \
+      --min-mutations-per-cluster 3 \
       --fixClusterMapping \
       --objective cluster \
       --clusterWeight equal \
@@ -79,15 +79,33 @@ citup1c:
       --enum-time-limit 3600 \
       --mike-node-trigger-mode proxy_all_obs \
       --mike-admissibility-mode recursive \
+  meso:
+    citup_py: "../CITUP/citup_recomb_w_mike_mig12.py"
+    num_solutions: 1
+    dag_solutions: 1
+    args: | 
+      --max-root-out-degree 1 \
+      --min-mutations-per-cluster 3 \
+      --fixClusterMapping \
+      --objective cluster \
+      --clusterWeight equal \
+      --clip-observed-at 1.0 \
+      --co-presence-reward 0 \
+      --mike-presence-threshold 0.025 \
+      --presence-threshold 0.025 \
+      --enum-max-trees 1 \
+      --enum-time-limit 3600 \
+      --mike-node-trigger-mode proxy_all_obs \
+      --mike-admissibility-mode recursive \
 
 citup2_no_migrations:  # stage1b
-  tracerx:
+  meso:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
     dag_solutions: 1
     args: | 
       --max-root-out-degree 1 \
-      --min-mutations-per-cluster 0 \
+      --min-mutations-per-cluster 3 \
       --fixClusterMapping \
       --objective cluster \
       --clusterWeight equal \
@@ -115,13 +133,13 @@ citup2_no_migrations:  # stage1b
 
 
 citup_scan: #stage 2
-  tracerx:
+  meso:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
-    num_solutions: 1
-    dag_solutions: 1
+    num_solutions: 10
+    dag_solutions: 10
     args: | 
       --max-root-out-degree 1 \
-      --min-mutations-per-cluster 0 \
+      --min-mutations-per-cluster 3 \
       --fixClusterMapping \
       --objective cluster \
       --clusterWeight equal \
@@ -167,13 +185,13 @@ citup_scan: #stage 2
       --mike-admissibility-mode recursive \
 
 citup_optimal:  # stage3
-  tracerx:
+  meso:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 10
     dag_solutions: 10
     args: | 
       --max-root-out-degree 1 \
-      --min-mutations-per-cluster 0 \
+      --min-mutations-per-cluster 3 \
       --fixClusterMapping \
       --objective cluster \
       --clusterWeight equal \

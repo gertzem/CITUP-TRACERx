@@ -22,7 +22,7 @@ def full_citup_scan(samplesheet):
     return scan
 
 def display_citup_scan(samplesheet):
-    samplesheet = samplesheet[~samplesheet.tests.isna()]
+    samplesheet = samplesheet[~samplesheet.display_tests.isna()]
     short_scan = samplesheet[['person']].copy()
     short_scan['display_tests'] = samplesheet.display_tests.apply(lambda x : [int(i) for i in x.split(',')])
     scan = short_scan.explode('display_tests', ignore_index=True)

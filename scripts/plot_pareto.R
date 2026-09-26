@@ -4,37 +4,10 @@ library(glue)
 library(ggrepel)
 library(ggbeeswarm)
 
-samplesheet <- read_tsv("samplesheet-tracerx.tsv")
+samplesheet <- read_tsv("samplesheet-meso.tsv")
 
-fixed_optima <- read_tsv("results/fixed_trees/tracerx/optima.tsv",
-  col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"),
-  col_types = cols(
-    person = col_character(),
-    migrations = col_double(),
-    commigrations = col_double(),
-    tree_score = col_double(),
-    tree_hash = col_character()
-  )
-)
-conipher_scores <- fixed_optima %>% select("person", "tree_score")
 
-mach2_migrations <- read_tsv("results/summary/mach2_migrations.tsv",
-  col_names = c("person", "migrations", "commigrations", "is_dag"),
-  col_types = cols(
-    person = col_character(),
-    migrations = col_double(),
-    commigrations = col_double(),
-    is_dag = col_logical()
-  )
-)
-metient_migrations <- read_tsv("results/summary/metient_migrations.tsv",
-  col_names = c("person", "migrations", "commigrations"), col_types = cols(
-    person = col_character(),
-    migrations = col_double(),
-    commigrations = col_double()
-  )
-)
-pareto_migrations <- read_tsv("results/migration_scan/tracerx/pareto/optima.tsv",
+pareto_migrations <- read_tsv("results/migration_scan/meso/pareto/optima.tsv",
   col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"),
   col_types = cols(
     person = col_character(),
@@ -45,12 +18,12 @@ pareto_migrations <- read_tsv("results/migration_scan/tracerx/pareto/optima.tsv"
   )
 )
 
-dir.create("results/pareto_plots/tracerx", recursive = TRUE, showWarnings = FALSE)
+dir.create("results/pareto_plots/meso", recursive = TRUE, showWarnings = FALSE)
 
 for (i in seq_len(nrow(samplesheet))) {
   person <- samplesheet$person[i]
-  person_front <- glue("results/migration_scan/tracerx/pareto/{person}/pareto.txt")
-  outfile <- glue("results/pareto_plots/tracerx/{person}_pareto.pdf")
+  person_front <- glue("results/migration_scan/meso/pareto/{person}/pareto.txt")
+  outfile <- glue("results/pareto_plots/meso/{person}_pareto.pdf")
   pareto <- read_tsv(person_front,
     col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"), 
     col_types = cols(
@@ -62,18 +35,9 @@ for (i in seq_len(nrow(samplesheet))) {
     )
   )
 
-  mach2 <- mach2_migrations %>%
-    filter(person == !!person) %>%
-    inner_join(conipher_scores, by = "person")
   pareto_optimal <- pareto_migrations %>% filter(person == !!person)
-  metient <- metient_migrations %>%
-    filter(person == !!person) %>%
-    inner_join(conipher_scores, by = "person")
-
   special_points <- bind_rows(
     pareto_optimal %>% mutate(tool = "Pareto Optimal"),
-    mach2 %>% mutate(tool = "MACH2"),
-    metient %>% mutate(tool = "Metient")
   )
   min_x <- min(pareto$migrations)
   max_x <- max(pareto$migrations)
