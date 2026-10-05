@@ -181,6 +181,47 @@ rule migrations_for_citup_optima_stage1:
         """
 
 
+rule min_migrations_for_citup_optima_stage1:
+    output:
+        directory("results/min_trees/{cohort}/{person}/trees"),
+    input:
+        mutations="data/{cohort}/{person}/mutations.tsv",
+        sites="data/{cohort}/{person}/sites.tsv",
+        #optima="results/optimal_trees/{cohort}/{person}/trees"
+    params:
+        args=lambda w: config["citup1c"][w.cohort]["args"],
+        citup_py=lambda w: config["citup1c"][w.cohort]["citup_py"],
+        numSolutions=lambda w: config["citup1c"][w.cohort]["num_solutions"],
+        dagSolutions=lambda w: config["citup1c"][w.cohort]["dag_solutions"],
+        metastatic_sites = lambda w: metastatic_sites_option(w.person),
+        tree_scores = lambda w: expand("results/optimal_trees/{cohort}/{person}/trees/{person}.tree_0.txt",
+                                        cohort=w.cohort, person=w.person),
+    resources:
+        runtime=960,
+        mem_mb=8 * 1024,
+    log:
+        "results/min_trees/{cohort}/{person}/logs/citup.log"
+    threads: 8
+    shell:
+        """
+        echo "Job ID: ${{SLURM_JOB_ID:-NA}}" > {log}
+        outdir={output[0]}
+        mkdir -p $outdir
+        outprefix="$outdir/{wildcards.person}"
+        tree_score=$(python scripts/tree_score.py {params.tree_scores})
+
+        python {params.citup_py} \\
+            -f {input.mutations} \\
+            --sites-file {input.sites} \\
+            -o $outprefix \\
+            --numSolutions {params.numSolutions} \\
+            --minimize-migrations-at-score $tree_score --migration-score-epsilon 0.05 \\
+            --migration-score-source without-reward \\
+            --mike-max-refined-solutions {params.dagSolutions} \\
+            {params.args} --gurobi-threads {threads} >> {log} 2>&1
+        """
+
+
 rule scan_for_target_migrations_stage2:
     output:
         directory("results/migration_scan/{cohort}/mig_{migrations}/{person}")
@@ -275,6 +316,15 @@ rule stage1_optimal_trees_all:
     input:
         expand(
             "results/optimal_trees/{cohort}/{person}/trees",
+            cohort=COHORT,
+            person=SAMPLESHEET.person,
+        ),
+
+
+rule stage1_min_trees_all:
+    input:
+        expand(
+            "results/min_trees/{cohort}/{person}/trees",
             cohort=COHORT,
             person=SAMPLESHEET.person,
         ),
