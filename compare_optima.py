@@ -275,4 +275,12 @@ print(
     ].to_markdown(index=False)
 )
 
+print(cmp.query('quad_us < quad_them & migrations_us < migrations_them')[['person', 'quad_us', 'quad_them', 'migrations_us', 'migrations_them', 'migrations_mach2', 'migrations_metient', 'is_dag']].to_markdown())
+
+print(cmp.query('quad_us < quad_them')[['person', 'quad_us', 'quad_them', 'migrations_us', 'migrations_them', 'migrations_mach2', 'migrations_metient', 'is_dag']].to_markdown())
+
+print(cmp.query('migrations_us != migrations_them')[['person', 'quad_us', 'quad_them', 'migrations_us', 'migrations_them', 'migrations_mach2', 'migrations_metient', 'is_dag']].to_markdown())
+
+cmp.loc['CRUK0748']
+
 
