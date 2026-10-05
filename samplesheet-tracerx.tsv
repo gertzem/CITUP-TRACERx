@@ -65,7 +65,7 @@ CRUK0468	p.lymphnode1,p.lymphnode2	5	2,3,4,5	6,7,8,9,10
 CRUK0472	p.lymphnode1,relapse1	3	2,3	4,5,6,7,8
 CRUK0476	p.lymphnode1	3	1,2,3	4,5,6,7,8
 CRUK0478	relapse1	4	1,2,3,4,5	6,7,8,9,10
-CRUK0484	p.lymphnode1,progression1,p.lymphnode2,progression2,progression2,relapse1	13	5,6,7,8,9,10,11,12,13	14,15,16,17,18
+CRUK0484	p.lymphnode1,progression1,p.lymphnode2,progression2,progression2,relapse1	12	5,6,7,8,9,10,11,12,13	14,15,16,17,18
 CRUK0485	p.lymphnode1	1	1	2,3,4,5,6
 CRUK0487	p.lymphnode1,p.lymphnode6,p.lymphnode5,p.lymphnode4	11	4,5,6,7,8,9,10,11,12	13,14,15,16,17
 CRUK0495	synchronous	2	1,2	3,4,5,6,7
