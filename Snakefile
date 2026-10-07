@@ -209,11 +209,14 @@ rule min_migrations_for_citup_optima_stage1:
         mkdir -p $outdir
         outprefix="$outdir/{wildcards.person}"
         tree_score=$(python scripts/tree_score.py {params.tree_scores})
+        python scripts/extract_fixed_tree.py {params.tree_scores} $outdir >> {log} 2>&1
 
         python {params.citup_py} \\
             -f {input.mutations} \\
             --sites-file {input.sites} \\
             -o $outprefix \\
+            --warm-start-first-phase-b $outdir/fixed_B.tsv \\
+            --warm-start-first-phase-delta $outdir/fixed_delta.tsv {params.metastatic_sites} \\
             --numSolutions {params.numSolutions} \\
             --minimize-migrations-at-score $tree_score --migration-score-epsilon 0.05 \\
             --migration-score-source without-reward \\
