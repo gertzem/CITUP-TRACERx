@@ -18,7 +18,6 @@ citup2:  # stage0,1
       --enum-time-limit 3600 \
       --mike-gamma 0.01 \
       --mike-node-trigger-mode proxy_all_obs \
-      --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
   nostack:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
@@ -57,7 +56,6 @@ citup2:  # stage0,1
       --enum-time-limit 3600 \
       --mike-gamma 0.01 \
       --mike-node-trigger-mode proxy_all_obs \
-      --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
 
 citup1c:
@@ -114,7 +112,6 @@ citup2_no_migrations:  # stage1b
       --presence-threshold 0.025 \
       --enum-max-trees 1 \
       --enum-time-limit 3600 \
-      --duo-present-reward 0.0051  \
   nostack:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
     num_solutions: 1
@@ -148,7 +145,6 @@ citup_scan: #stage 2
       --mike-presence-threshold 0.025 \
       --presence-threshold 0.025 \
       --mike-node-trigger-mode proxy_all_obs \
-      --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
   nostack:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
@@ -181,7 +177,6 @@ citup_scan: #stage 2
       --mike-presence-threshold 0.025 \
       --presence-threshold 0.025 \
       --mike-node-trigger-mode proxy_all_obs \
-      --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
 
 citup_optimal:  # stage3
@@ -200,7 +195,6 @@ citup_optimal:  # stage3
       --mike-presence-threshold 0.025 \
       --presence-threshold 0.025 \
       --mike-node-trigger-mode proxy_all_obs \
-      --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
   nostack:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
@@ -233,5 +227,4 @@ citup_optimal:  # stage3
       --mike-presence-threshold 0.025 \
       --presence-threshold 0.025 \
       --mike-node-trigger-mode proxy_all_obs \
-      --duo-present-reward 0.0051  \
       --mike-admissibility-mode recursive \
