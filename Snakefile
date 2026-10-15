@@ -215,12 +215,12 @@ rule min_migrations_for_citup_optima_stage1:
             -f {input.mutations} \\
             --sites-file {input.sites} \\
             -o $outprefix \\
+            --fit-time-limit 84600 \\
             --warm-start-first-phase-b $outdir/fixed_B.tsv \\
             --warm-start-first-phase-delta $outdir/fixed_delta.tsv {params.metastatic_sites} \\
             --numSolutions {params.numSolutions} \\
             --minimize-migrations-at-score $tree_score --migration-score-epsilon 0.05 \\
             --migration-score-source without-reward \\
-            --mike-max-refined-solutions {params.dagSolutions} \\
             {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
@@ -295,6 +295,27 @@ rule rerun_with_optimal_migrations_stage3:
             {params.args} --gurobi-threads {threads} >> {log} 2>&1
         """
 
+
+rule run_conipher:
+    input:
+        "data/conipher/{case_id}/input.tsv"
+    output:
+        directory("results/conipher/{case_id}")
+    resources:
+        runtime=24 * 60,
+        mem_mb=8 * 1024,
+    shell:
+        """
+        Rscript CONIPHER-wrapper/src/run_treebuilding.R --input_tsv {input} \
+            --out_dir {output} --prefix m --min_cluster_size=1
+        """
+
+rule conipher_trees_all:
+    input:
+        expand(
+            "results/conipher/{person}",
+            person=SAMPLESHEET.person,
+        ),
 
 
 rule stage0_fixed_trees_all:

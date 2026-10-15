@@ -1,4 +1,4 @@
-cohort: "tracerx"
+cohort: "sims"
 citup2:  # stage0,1
   tracerx:
     citup_py: "../CITUP/citup_recomb_w_mike_mig11.py"
@@ -98,8 +98,8 @@ citup1c:
       --mike-admissibility-mode recursive \
   sims:
     citup_py: "../CITUP/citup_recomb_w_mike_mig12.py"
-    num_solutions: 10
-    dag_solutions: 10
+    num_solutions: 1
+    dag_solutions: 0
     args: | 
       --max-root-out-degree 1 \
       --min-mutations-per-cluster 0 \
