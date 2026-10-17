@@ -307,6 +307,7 @@ rule run_conipher:
     shell:
         """
         Rscript CONIPHER-wrapper/src/run_treebuilding.R --input_tsv {input} \
+            --min_cluster_size=3 --multi_trees=FALSE --pval_cutoff=0.05 \
             --out_dir {output} --prefix m --min_cluster_size=1
         """
 
