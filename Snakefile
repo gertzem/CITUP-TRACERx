@@ -197,7 +197,7 @@ rule min_migrations_for_citup_optima_stage1:
         tree_scores = lambda w: expand("results/optimal_trees/{cohort}/{person}/trees/{person}.tree_0.txt",
                                         cohort=w.cohort, person=w.person),
     resources:
-        runtime=960,
+        runtime=990,
         mem_mb=8 * 1024,
     log:
         "results/min_trees/{cohort}/{person}/logs/citup.log"
@@ -215,7 +215,7 @@ rule min_migrations_for_citup_optima_stage1:
             -f {input.mutations} \\
             --sites-file {input.sites} \\
             -o $outprefix \\
-            --fit-time-limit 84600 \\
+            --fit-time-limit 57600 \\
             --warm-start-first-phase-b $outdir/fixed_B.tsv \\
             --warm-start-first-phase-delta $outdir/fixed_delta.tsv {params.metastatic_sites} \\
             --numSolutions {params.numSolutions} \\
