@@ -3,6 +3,7 @@ import csv
 from collections import Counter
 from typing import NamedTuple
 import numpy as np
+from pathlib import Path
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", required=True, choices=["citupm", "mach2"])
@@ -52,6 +53,7 @@ def read_citupm(path: str) -> set[Edge]:
     return edges
 
 
+case = Path(args.ground_truth).parent.name
 ground_truth = read_ground_truth(args.ground_truth)
 scores = []
 for path in args.inferred:
@@ -68,4 +70,4 @@ for path in args.inferred:
         f1 = 2 * (precision * recall) / (precision + recall)
     scores.append(f1)
     # print(precision, recall, f1, sep="\t")
-print(np.median(scores))
+print(case, np.median(scores), sep="\t")
