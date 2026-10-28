@@ -50,6 +50,11 @@ dir.create("results/pareto_plots/tracerx", recursive = TRUE, showWarnings = FALS
 for (i in seq_len(nrow(samplesheet))) {
   person <- samplesheet$person[i]
   person_front <- glue("results/migration_scan/tracerx/pareto/{person}/pareto.txt")
+  if (!file.exists(person_front)) {
+    cat('Skipping', person, '\n')
+    next
+  }
+  cat(person, '\n')
   outfile <- glue("results/pareto_plots/tracerx/{person}_pareto.pdf")
   pareto <- read_tsv(person_front,
     col_names = c("person", "migrations", "commigrations", "tree_score", "tree_hash"), 
@@ -71,7 +76,7 @@ for (i in seq_len(nrow(samplesheet))) {
     inner_join(conipher_scores, by = "person")
 
   special_points <- bind_rows(
-    pareto_optimal %>% mutate(tool = "Pareto Optimal"),
+    pareto_optimal %>% mutate(tool = "CITUPm"),
     mach2 %>% mutate(tool = "MACH2"),
     metient %>% mutate(tool = "Metient")
   )
