@@ -82,14 +82,14 @@ for (i in seq_len(nrow(samplesheet))) {
   )
   min_x <- min(pareto$migrations)
   max_x <- max(pareto$migrations)
-  p <- ggplot(pareto, aes(x = migrations, y = tree_score)) +
+  p <- ggplot(pareto, aes(x = migrations, y = sqrt(tree_score))) +
     geom_line() +
     geom_point() +
     geom_point(
       data = special_points,
       aes(
         x = migrations,
-        y = tree_score,
+        y = sqrt(tree_score),
         color = tool,
         shape = tool
       ),
@@ -98,7 +98,7 @@ for (i in seq_len(nrow(samplesheet))) {
     ) +
     labs(
       x = "Migrations",
-      y = "Tree Score (lower is better)",
+      y = "Square Root DCF Fit (lower is better)",
       title = person,
       color = NULL,
       shape = NULL
